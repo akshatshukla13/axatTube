@@ -14,7 +14,7 @@ export const fetchUserDetails = createAsyncThunk(
         method: "get",
         url: "/api/users/current-user/",
       });
-      toast.success("welcome," + response.data.data.userName);
+      // toast.success("welcome," + response.data.data.userName);
       console.log(response.data);
       return response.data;
     } catch (error) {

@@ -2,22 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchVideoDetails, resetPerticularVideo } from "@/app/slices/videoSlice";
 
 function VideoListingCardPage() {
-  const [videoData, setVideoData] = useState(null);
-
+  const videoData  = useSelector(state=>state.video.data)
+  
+  const dispatch = useDispatch()
+  
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await axios.get("/api/videos/");
-        const data = await response.data.data
-        setVideoData(data)
-        
-      } catch (error) {
-        console.error("Error fetching video data:", error); 
-      }
-    })();
-  }, []);
+    dispatch(fetchVideoDetails())
+    dispatch(resetPerticularVideo())
+  }, [])
   
 
   const navigate = useNavigate();
@@ -27,12 +23,13 @@ function VideoListingCardPage() {
       <section class="bg-[#121212] text-white w-full pb-[70px] sm:ml-[70px] sm:pb-0 lg:ml-0">
         <div class="  grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-4 p-4">
 
-        {videoData && videoData.map((e)=> <>
+        {videoData && videoData.data.map((e)=> <>
         {/* imp video div */}
         <div class=" w-full">
           <div class="relative mb-2 w-full pt-[56%]">
             <div
               onClick={() => {
+                // dispatch(resetPerticularVideo())
                 navigate("/video/" + e._id);
               }}
               class="absolute inset-0"

@@ -5,10 +5,42 @@ import axios from "axios";
 export const fetchVideoDetails = createAsyncThunk(
   "fetchVideoDetails",
   async () => {
-    const response = await axios.get(
-      "https://aktube.vercel.app/users/current-user/"
-    );
-    return response.data.data;
+    try {
+      console.log("doing");
+      // const response = await axios.get("/api/users/current-user/");
+      const response = await axios({
+        method: "get",
+        url: "/api/videos/",
+      });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log("Err ");
+      const err = parseAxiosError(error.response.data);
+      console.log(err);
+      throw error;
+    }
+  }
+);
+
+export const fetchPerticularVideoDetails = createAsyncThunk(
+  "fetchPerticularVideoDetails",
+  async ({id}) => {
+    try {
+      console.log("doing pv");
+      const response = await axios({
+        method: "get",
+        url: `/api/videos/${id}`,
+      });
+      // console.log("pvv fetched");
+      // console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log("Err ");
+      const err = parseAxiosError(error.response.data);
+      console.log(err);
+      throw error;
+    }
   }
 );
 
@@ -16,6 +48,7 @@ const initialState = {
   isLoading: false,
   data: null,
   isError: false,
+  perticularVideoData: null,
 };
 
 export const videoSlice = createSlice({
@@ -34,8 +67,27 @@ export const videoSlice = createSlice({
       state.isError = true;
       state.isLoading = false;
     });
+
+    builder.addCase(fetchPerticularVideoDetails.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchPerticularVideoDetails.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.perticularVideoData = action.payload;
+    });
+    builder.addCase(fetchPerticularVideoDetails.rejected, (state, action) => {
+      console.log("Error", action.payload);
+      state.isError = true;
+      state.isLoading = false;
+    });
   },
-  reducers: {},
+  reducers: {
+    resetPerticularVideo : (state,action)=>{
+      state.perticularVideoData = null;
+    }
+  },
 });
+
+export const {resetPerticularVideo} = videoSlice.actions
 
 export default videoSlice.reducer;

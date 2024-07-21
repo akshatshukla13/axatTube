@@ -20,7 +20,8 @@ export const LogedInUser = createAsyncThunk(
         },
       });
       toast.success("LogedIn");
-      console.log(response.data);
+      toast.success("hello, "+response.data.data.user.fullName)
+      console.log("hii....",response.data.data.user.fullName);
       return response.data;
     } catch (error) {
       console.log("Err ");
