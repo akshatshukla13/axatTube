@@ -12,6 +12,12 @@ app.use(
   })
 );
 
+app.use(cors({
+  origin: 'https://axattube-1.onrender.com/',
+  credentials: true // This is important for cookies to be sent
+}));
+
+
 app.use(express.json({ limit: "16kb" }));
 
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));

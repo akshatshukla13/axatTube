@@ -135,8 +135,10 @@ const loginUser = AsyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-  };
+    secure: true, // Set this to true if your site is HTTPS
+    sameSite: 'None', // This is required for cross-site cookies
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
+  }
 
   return res
     .status(200)
@@ -170,8 +172,10 @@ const logoutUser = AsyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-  };
+    secure: true, // Set this to true if your site is HTTPS
+    sameSite: 'None', // This is required for cross-site cookies
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
+  }
 
   return res
     .status(200)
@@ -205,8 +209,10 @@ const refreshAccessToken = AsyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
-    };
+      secure: true, // Set this to true if your site is HTTPS
+      sameSite: 'None', // This is required for cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    }
 
     const { accessToken, newRefreshToken } =
       await generateAccessAndRefereshTokens(user._id);
