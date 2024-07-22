@@ -7,10 +7,10 @@ export const fetchVideoDetails = createAsyncThunk(
   async () => {
     try {
       console.log("doing");
-      // const response = await axios.get("/api/users/current-user/");
+      // const response = await axios.get("https://axattube.onrender.com/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "/api/videos/",
+        url: "https://axattube.onrender.com/videos/",
       });
       console.log(response.data);
       return response.data;
@@ -30,7 +30,7 @@ export const fetchPerticularVideoDetails = createAsyncThunk(
       console.log("doing pv");
       const response = await axios({
         method: "get",
-        url: `/api/videos/${id}`,
+        url: `https://axattube.onrender.com/videos/${id}`,
       });
       // console.log("pvv fetched");
       // console.log(response.data);
