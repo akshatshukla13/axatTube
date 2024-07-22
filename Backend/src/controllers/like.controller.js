@@ -20,22 +20,16 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     throw new ApiError(400, "video not exists with this VideoId");
   }
 
-  const likedStatus = await Video.findOne(
-    { video: videoId },
+  console.log("hii", videoExist);
+
+  const likedStatus = await Like.findOne(
+    { video: videoExist._id },
     { likedBy: req.user._id }
   );
 
-  if (likedStatus) {
-    const removeLike = await Like.findByIdAndDelete(likedStatus._id);
+  console.log("Liked Status", likedStatus);
 
-    if (!removeLike) {
-      throw new ApiError(400, "unable to remove like from video");
-    }
-
-    res
-      .status(200)
-      .json(new ApiResponse(200, removeLike, "successfully removed Like"));
-  } else {
+  if (!likedStatus) {
     const addLike = await Like.create({
       video: videoId,
       likedBy: req.user._id,
@@ -45,6 +39,17 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
       throw new ApiError(400, "unable to like the video");
     }
     res.status(200).json(new ApiResponse(200, addLike, "successfully Liked"));
+    //
+  } else {
+    const removeLike = await Like.findByIdAndDelete(likedStatus._id);
+
+    if (!removeLike) {
+      throw new ApiError(400, "unable to remove like from video");
+    }
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, removeLike, "successfully removed Like"));
   }
 });
 
@@ -132,10 +137,23 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
-  const likedVideos = await Like.find(
-    { likedBy: req.user._id },
-    { video: { $exists: true } }
-  );
+
+  const userId = req.user._id;
+
+  if (!userId) {
+    throw new ApiError(401, "give userId");
+  }
+
+  const likedVideos = await Like.find({
+    likedBy: req.user._id,
+    video: { $exists: true },
+  }).populate({
+    path: "video",
+    populate: {
+      path: "owner",
+      select: "userName id fullName avatar",
+    },
+  });
 
   if (!likedVideos) {
     throw new ApiError(401, "No Video Liked by User");
@@ -148,4 +166,21 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     );
 });
 
-export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
+const getNoOfLikes = asyncHandler(async (req, res) => {
+  //TODO: get no of videolikes
+  const { id } = req.params;
+
+  const noOfLikes = await Like.countDocuments({ video: id });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, noOfLikes, "no of likes fetched successfully"));
+});
+
+export {
+  toggleCommentLike,
+  toggleTweetLike,
+  toggleVideoLike,
+  getLikedVideos,
+  getNoOfLikes,
+};

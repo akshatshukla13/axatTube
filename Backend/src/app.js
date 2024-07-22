@@ -29,6 +29,7 @@ import tweetRouter from "./routes/tweet.routes.js";
 import healthRouter from "./routes/healthcheck.routes.js";
 import commentRoute from "./routes/comment.routes.js";
 import playlistRoute from "./routes/playlist.routes.js";
+import likeRoute from "./routes/like.routes.js";
 
 app.use("/users", userRouter);
 
@@ -41,5 +42,7 @@ app.use("/health", healthRouter);
 app.use("/comment", commentRoute);
 
 app.use("/playlist", playlistRoute);
+
+app.use("/like", likeRoute);
 
 export { app };
