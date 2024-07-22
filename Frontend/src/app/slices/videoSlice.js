@@ -11,6 +11,7 @@ export const fetchVideoDetails = createAsyncThunk(
       const response = await axios({
         method: "get",
         url: "https://axattube.onrender.com/videos/",
+        withCredentials: true,
       });
       console.log(response.data);
       return response.data;
@@ -31,6 +32,7 @@ export const fetchPerticularVideoDetails = createAsyncThunk(
       const response = await axios({
         method: "get",
         url: `https://axattube.onrender.com/videos/${id}`,
+        withCredentials: true,
       });
       // console.log("pvv fetched");
       // console.log(response.data);

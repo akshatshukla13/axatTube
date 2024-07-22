@@ -18,6 +18,7 @@ export const LogedInUser = createAsyncThunk(
         headers: {
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       toast.success("LogedIn");
       toast.success("hello, "+response.data.data.user.fullName)
@@ -38,6 +39,7 @@ export const LogedOutUser = createAsyncThunk("LogedOutUser", async () => {
     const response = await axios({
       method: "post",
       url: "https://axattube.onrender.com/users/logout/",
+      withCredentials: true,
     });
     toast.success("LogedOut");
     console.log(response.data);
