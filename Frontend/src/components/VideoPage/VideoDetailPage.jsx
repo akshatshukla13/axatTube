@@ -19,7 +19,7 @@ function VideoDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("/api/videos/");
+        const response = await axios.get("https://backnnfront.vercel.app/videos/");
         const data = await response.data.data;
         setSideVideoData(data);
         console.log(data);

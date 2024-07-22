@@ -9,10 +9,10 @@ export const fetchUserDetails = createAsyncThunk(
   async () => {
     try {
       console.log("doing");
-      // const response = await axios.get("/api/users/current-user/");
+      // const response = await axios.get("https://backnnfront.vercel.app/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "/api/users/current-user/",
+        url: "https://backnnfront.vercel.app/users/current-user/",
       });
       // toast.success("welcome," + response.data.data.userName);
       console.log(response.data);
