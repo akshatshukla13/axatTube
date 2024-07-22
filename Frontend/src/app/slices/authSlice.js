@@ -10,7 +10,7 @@ export const LogedInUser = createAsyncThunk(
     try {
       const response = await axios({
         method: "post",
-        url: "https://backnnfront.vercel.app/users/login/",
+        url: "/api/users/login/",
         data: {
           email: email,
           password: password,
@@ -37,7 +37,7 @@ export const LogedOutUser = createAsyncThunk("LogedOutUser", async () => {
   try {
     const response = await axios({
       method: "post",
-      url: "https://backnnfront.vercel.app/users/logout/",
+      url: "/api/users/logout/",
     });
     toast.success("LogedOut");
     console.log(response.data);
