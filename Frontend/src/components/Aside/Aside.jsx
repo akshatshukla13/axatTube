@@ -1,10 +1,12 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate, useNavigation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function Aside() {
   const navigate = useNavigate();
   const { username } = useParams();
+  const logedin = useSelector((state) => state.user.data);
 
   return (
     <aside class="text-white  group fixed   bottom-0 z-40 w-full shrink-0 border-t border-white bg-[#121212] px-2 py-2 sm:absolute sm:inset-y-0 sm:max-w-[70px] sm:border-r sm:border-t-0 sm:py-6 sm:hover:max-w-[250px] lg:sticky lg:max-w-[250px]">
@@ -12,7 +14,7 @@ function Aside() {
         <li class="">
           <button
             onClick={() => {
-              navigate("/");
+              navigate("/" + logedin.data.userName);
             }}
             class="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black sm:group-hover:justify-start sm:group-hover:px-4 lg:justify-start lg:px-4"
           >
@@ -45,7 +47,7 @@ function Aside() {
                 navigate("/@/" + username + "/like");
               } else {
                 toast.error("Please login...");
-                toast("Please login...");
+                toast("Please login...!!!");
               }
             }}
             class="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black sm:group-hover:justify-start sm:group-hover:px-4 lg:justify-start lg:px-4"
@@ -103,7 +105,7 @@ function Aside() {
         <li class="hidden sm:block">
           <button
             onClick={() => {
-              navigate("/@/" + username + "/mycontent");
+              navigate("/@/" + username + "/videos");
             }}
             class="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black sm:group-hover:justify-start sm:group-hover:px-4 lg:justify-start lg:px-4"
           >

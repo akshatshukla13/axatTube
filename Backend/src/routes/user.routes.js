@@ -55,8 +55,10 @@ router
 router
   .route("/avatar")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
-export default router;
+
 
 router.route("/c/:userName").get(verifyJWT, getUserChannelProfile);
 
 router.route("/history").get(verifyJWT, getWatchHistory);
+
+export default router;

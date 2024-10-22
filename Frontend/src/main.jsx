@@ -86,7 +86,7 @@ const router = createBrowserRouter([
   },
   //
 
-  //user channel route
+  //user channel route (MY)
   {
     path: "/@/:username",
     element: <Layout />,

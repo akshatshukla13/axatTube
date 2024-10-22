@@ -3,38 +3,75 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPerticularVideoDetails } from "@/app/slices/videoSlice";
+import { fetchVideoComments } from "@/app/slices/commentSlice";
 
 function VideoDetailPage() {
   const navigate = useNavigate();
   var { id } = useParams();
   const dispatch = useDispatch();
   const videoData = useSelector((state) => state.video.perticularVideoData);
+  const commentData = useSelector((state) => state.comment.data);
   const [sideVideoData, setSideVideoData] = useState(null);
+  const [comment, setComment] = useState("");
+  const [like, setLike] = useState(null);
 
   useEffect(() => {
     dispatch(fetchPerticularVideoDetails({ id }));
+    dispatch(fetchVideoComments({ id }));
   }, []);
-
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("https://axattube.onrender.com/videos/");
+        const response = await axios.get("/api/videos/");
         const data = await response.data.data;
         setSideVideoData(data);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching video data:", error);
       }
     })();
   }, []);
 
+  const handleInputChange = (event) => {
+    setComment(event.target.value);
+  };
+
+  const handleCommentForm = async () => {
+    console.log("cmdata:", commentData.data);
+    setComment("")
+    //here send comment through api
+    const formData = new FormData();
+    formData.append("content", comment);
+    if (comment.trim() != "") {
+      const resp = await axios({
+        method: "post",
+        url: `/api/comment/${videoData.data._id}`,
+        data: formData,
+        withCredentials: true,
+      });
+      // console.log(videoData.data._id);
+      // console.log(resp.data);
+      dispatch(fetchVideoComments({ id }));
+    }
+  };
+
+  const likeHandler = async (e) => {
+    e.preventDefault()
+    if (like != null) return
+    setLike(videoData.data.noOfLikes + 1);
+    const resp = await axios({
+      method: "post",
+      url: `/api/like/toggle/v/${videoData.data._id}`,
+      withCredentials: true,
+    });
+  }
+
   return (
     videoData && (
       <>
         <div class="h-screen overflow-y-auto bg-[#121212] text-white">
           <div class="flex min-h-[calc(100vh-66px)] sm:min-h-[calc(100vh-82px)]">
-            <aside class="group fixed inset-x-0 bottom-0 z-40 w-full shrink-0 border-t border-white bg-[#121212] px-2 py-2 sm:absolute sm:inset-y-0 sm:max-w-[70px] sm:border-r sm:border-t-0 sm:py-6 sm:hover:max-w-[250px]">
+            {/* <aside class="group fixed inset-x-0 bottom-0 z-40 w-full shrink-0 border-t border-white bg-[#121212] px-2 py-2 sm:absolute sm:inset-y-0 sm:max-w-[70px] sm:border-r sm:border-t-0 sm:py-6 sm:hover:max-w-[250px]">
               <ul class="flex justify-around gap-y-2 sm:sticky sm:top-[106px] sm:min-h-[calc(100vh-130px)] sm:flex-col">
                 <li class="">
                   <button class="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black sm:group-hover:justify-start sm:group-hover:px-4 lg:justify-start lg:px-4">
@@ -243,7 +280,7 @@ function VideoDetailPage() {
                   </button>
                 </li>
               </ul>
-            </aside>
+            </aside> */}
 
             <section class="w-full pb-[70px] sm:ml-[70px] sm:pb-0">
               <div class="flex w-full flex-wrap gap-4 p-4 lg:flex-nowrap">
@@ -254,7 +291,10 @@ function VideoDetailPage() {
                     <div class="relative mb-4 w-full pt-[56%]">
                       <div class="absolute inset-0">
                         <video class="h-full w-full" controls autoPlay muted>
-                          <source src={videoData.data.videoFile} type="video/mp4" />
+                          <source
+                            src={videoData.data.videoFile}
+                            type="video/mp4"
+                          />
                         </video>
                       </div>
                     </div>
@@ -269,19 +309,24 @@ function VideoDetailPage() {
                       {/* save to playlist start */}
                       <div class="flex flex-wrap gap-y-2">
                         <div class="w-full md:w-1/2 lg:w-full xl:w-1/2">
-                          <h1 class="text-lg font-bold">{videoData.data.title}</h1>
+                          <h1 class="text-lg font-bold">
+                            {videoData.data.title}
+                          </h1>
                           <p class="flex text-sm text-gray-200">
-                            {videoData.data.views} Views ·{videoData.data.createdAt}
+                            {videoData.data.views} Views ·
+                            {videoData.data.createdAt}
                           </p>
                         </div>
                         <div class="w-full md:w-1/2 lg:w-full xl:w-1/2">
                           <div class="flex items-center justify-between gap-x-4 md:justify-end lg:justify-between xl:justify-end">
                             <div class="flex overflow-hidden rounded-lg border">
                               <button
+                                onClick={likeHandler}
                                 class="group/btn flex items-center gap-x-2 border-r border-gray-700 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
-                                data-like="3050"
-                                data-like-alt="3051"
+                              // data-like={videoData.data.noOfLikes}
+                              // data-like-alt={videoData.data.noOfLikes+1}
                               >
+                                {/* <h1>45</h1> */}
                                 <span class="inline-block w-5 group-focus/btn:text-[#ae7aff]">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -297,12 +342,14 @@ function VideoDetailPage() {
                                       d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
                                     ></path>
                                   </svg>
+
                                 </span>
+
+                                <h2>{like || videoData.data.noOfLikes}</h2> {/* like count */}
                               </button>
                               <button
                                 class="group/btn flex items-center gap-x-2 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
-                                data-like="20"
-                                data-like-alt="21"
+
                               >
                                 <span class="inline-block w-5 group-focus/btn:text-[#ae7aff]">
                                   <svg
@@ -611,13 +658,52 @@ function VideoDetailPage() {
                     <div class="fixed inset-x-0 top-full z-[60] h-[calc(100%-69px)] overflow-auto rounded-lg border bg-[#121212] p-4 duration-200 hover:top-[67px] peer-focus:top-[67px] sm:static sm:h-auto sm:max-h-[500px] lg:max-h-none">
                       <div class="block">
                         <h6 class="mb-4 font-semibold">573 Comments</h6>
+
                         <input
                           type="text"
                           class="w-full rounded-lg border bg-transparent px-2 py-1 placeholder-white"
                           placeholder="Add a Comment"
+                          value={comment}
+                          onChange={handleInputChange}
                         />
+                        <button
+                          class="border text-white font-sans hover:bg-black px-3 rounded-full m-2"
+                          onClick={handleCommentForm}
+                        >
+                          Submit
+                        </button>
                       </div>
                       <hr class="my-4 border-white" />
+                      <h1>hii</h1>
+                      {
+                        commentData && commentData.data.map((data) => (
+                          <div>
+                            <div class="flex gap-x-4">
+                              <div class="mt-2 h-11 w-11 shrink-0">
+                                <img
+                                  src="https://images.pexels.com/photos/18148932/pexels-photo-18148932/free-photo-of-woman-reading-book-on-a-bench.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                  alt="sarahjv"
+                                  class="h-full w-full rounded-full"
+                                />
+                              </div>
+                              <div class="block">
+                                <p class="flex items-center text-gray-200">
+                                  {data.owner.fullName}·
+                                  <span class="text-sm">{"{" + data.createdAt + "}"}</span>
+                                </p>
+                                <p class="text-sm text-gray-200">
+                                  {"@" + data.owner.userName}
+                                </p>
+                                <p class="mt-3 text-sm">
+                                  {data.content}
+                                </p>
+                              </div>
+                            </div>
+                            <hr class="my-4 border-white" />
+                          </div>
+                        ))
+                      }
+
                       <div>
                         <div class="flex gap-x-4">
                           <div class="mt-2 h-11 w-11 shrink-0">
@@ -637,174 +723,6 @@ function VideoDetailPage() {
                               This series is exactly what I&#x27;ve been looking
                               for! Excited to dive into these advanced React
                               patterns. Thanks for putting this together!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/18107025/pexels-photo-18107025/free-photo-of-man-reading-newspaper.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="mikerod"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Michael Rodriguez ·
-                              <span class="text-sm">5 minutes ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@mikerod</p>
-                            <p class="mt-3 text-sm">
-                              Render props have always been a bit tricky for me.
-                              Can&#x27;t wait to see how this series breaks it
-                              down. Thanks for sharing!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/18096595/pexels-photo-18096595/free-photo-of-music-on-street.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="emilyt"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Emily Turner ·
-                              <span class="text-sm">1 hour ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@emilyt</p>
-                            <p class="mt-3 text-sm">
-                              Higher-order components have been a mystery to me
-                              for far too long. Looking forward to demystifying
-                              them with this series. Thanks!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/18094275/pexels-photo-18094275.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="davidc"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              David Chen · 
-                              <span class="text-sm">3 hour ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@davidc</p>
-                            <p class="mt-3 text-sm">
-                              Compound components are a game-changer for UI
-                              development. Can&#x27;t wait to learn more about
-                              them. Great work on this series!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/13847596/pexels-photo-13847596.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="alex_p"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Alex Parker ·
-                              <span class="text-sm">12 hour ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@alex_p</p>
-                            <p class="mt-3 text-sm">
-                              Controlled vs. uncontrolled components - finally!
-                              This topic has always confused me. Thanks for
-                              breaking it down!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/7775637/pexels-photo-7775637.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="jessicalee"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Jessica Lee ·
-                              <span class="text-sm">5 hour ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@jessicalee</p>
-                            <p class="mt-3 text-sm">
-                              This series is a goldmine for React developers!
-                              Compound components are something I&#x27;ve been
-                              eager to master. Thanks for this!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/3532545/pexels-photo-3532545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="ryanjax"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Ryan Jackson · 
-                              <span class="text-sm">Just now</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@ryanjax</p>
-                            <p class="mt-3 text-sm">
-                              This is exactly what I needed to take my React
-                              skills to the next level. Looking forward to
-                              diving into the render props section!
-                            </p>
-                          </div>
-                        </div>
-                        <hr class="my-4 border-white" />
-                      </div>
-                      <div>
-                        <div class="flex gap-x-4">
-                          <div class="mt-2 h-11 w-11 shrink-0">
-                            <img
-                              src="https://images.pexels.com/photos/3532552/pexels-photo-3532552.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                              alt="lauraw"
-                              class="h-full w-full rounded-full"
-                            />
-                          </div>
-                          <div class="block">
-                            <p class="flex items-center text-gray-200">
-                              Laura Williams ·
-                              <span class="text-sm">1 minutes ago</span>
-                            </p>
-                            <p class="text-sm text-gray-200">@lauraw</p>
-                            <p class="mt-3 text-sm">
-                              This series looks amazing! I&#x27;m especially
-                              excited to learn more about controlled vs.
-                              uncontrolled components. Thanks for sharing!
                             </p>
                           </div>
                         </div>

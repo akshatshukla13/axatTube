@@ -7,10 +7,10 @@ export const fetchVideoDetails = createAsyncThunk(
   async () => {
     try {
       console.log("doing");
-      // const response = await axios.get("https://axattube.onrender.com/users/current-user/");
+      // const response = await axios.get("/api/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "https://axattube.onrender.com/videos/",
+        url: "/api/videos/",
         withCredentials: true,
       });
       console.log(response.data);
@@ -26,12 +26,12 @@ export const fetchVideoDetails = createAsyncThunk(
 
 export const fetchPerticularVideoDetails = createAsyncThunk(
   "fetchPerticularVideoDetails",
-  async ({id}) => {
+  async ({ id }) => {
     try {
       console.log("doing pv");
       const response = await axios({
         method: "get",
-        url: `https://axattube.onrender.com/videos/${id}`,
+        url: `/api/videos/${id}`,
         withCredentials: true,
       });
       // console.log("pvv fetched");
@@ -84,12 +84,12 @@ export const videoSlice = createSlice({
     });
   },
   reducers: {
-    resetPerticularVideo : (state,action)=>{
+    resetPerticularVideo: (state, action) => {
       state.perticularVideoData = null;
-    }
+    },
   },
 });
 
-export const {resetPerticularVideo} = videoSlice.actions
+export const { resetPerticularVideo } = videoSlice.actions;
 
 export default videoSlice.reducer;

@@ -12,8 +12,6 @@ function Header() {
   const navigate = useNavigate();
   const logedin = useSelector((state) => state.user.data);
   const dispatch = useDispatch();
-  const [username, setUserName] = useState("abcd");
-  const [userAvatar, setUserAvatar] = useState("abcdefg");
 
   useEffect(() => {
     //fetch current user, if avail then make logedin user right

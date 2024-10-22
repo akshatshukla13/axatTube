@@ -8,7 +8,19 @@ import { Video } from "../Models/video.model.js";
 const getVideoComments = AsyncHandler(async (req, res) => {
   //TODO: get all comments for a video
   const { videoId } = req.params;
-  const { page = 1, limit = 10 } = req.query;
+  // const { page = 1, limit = 10 } = req.query;
+  if(!videoId){
+    throw new ApiError(400,"no videoId");
+  }
+  const comments = await Comment.find({"video":videoId})
+  .populate({
+    path: "owner",
+    select: "userName fullName avatar updatedAt",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, comments, "Commment fetched successfully"));
 });
 
 const addComment = AsyncHandler(async (req, res) => {

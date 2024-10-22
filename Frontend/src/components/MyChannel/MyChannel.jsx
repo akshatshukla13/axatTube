@@ -8,7 +8,7 @@ function MyChannel({ Compo }) {
   const { username } = useParams();
 
 
-  const visible = false
+  const visible = true
 
   // Step 3: Create a function to toggle visibility
   const changeVisibility = () => {

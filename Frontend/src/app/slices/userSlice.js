@@ -9,10 +9,10 @@ export const fetchUserDetails = createAsyncThunk(
   async () => {
     try {
       console.log("doing");
-      // const response = await axios.get("https://axattube.onrender.com/users/current-user/");
+      // const response = await axios.get("/api/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "https://axattube.onrender.com/users/current-user/",
+        url: "/api/users/current-user/",
         withCredentials: true,
       });
       // toast.success("welcome," + response.data.data.userName);

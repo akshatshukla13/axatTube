@@ -10,7 +10,7 @@ export const LogedInUser = createAsyncThunk(
     try {
       const response = await axios({
         method: "post",
-        url: "https://axattube.onrender.com/users/login/",
+        url: "/api/users/login/",
         data: {
           email: email,
           password: password,
@@ -21,8 +21,8 @@ export const LogedInUser = createAsyncThunk(
         withCredentials: true,
       });
       toast.success("LogedIn");
-      toast.success("hello, "+response.data.data.user.fullName)
-      console.log("hii....",response.data.data.user.fullName);
+      toast.success("hello, " + response.data.data.user.fullName);
+      console.log("hii....", response.data.data.user.fullName);
       return response.data;
     } catch (error) {
       console.log("Err ");
@@ -38,7 +38,7 @@ export const LogedOutUser = createAsyncThunk("LogedOutUser", async () => {
   try {
     const response = await axios({
       method: "post",
-      url: "https://axattube.onrender.com/users/logout/",
+      url: "/api/users/logout/",
       withCredentials: true,
     });
     toast.success("LogedOut");
@@ -93,12 +93,11 @@ export const authSlice = createSlice({
     });
   },
   reducers: {
-    resetAuthData : (state,action)=>{
+    resetAuthData: (state, action) => {
       state.data = null;
-    }
+    },
   },
 });
 
-
-export const {resetAuthData} = authSlice.actions;
+export const { resetAuthData } = authSlice.actions;
 export default authSlice.reducer;

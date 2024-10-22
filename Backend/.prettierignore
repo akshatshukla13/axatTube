@@ -2,5 +2,9 @@
 .env
 .env.*
 /.vscode
-/node_modules
 ./dist
+build/
+node_modules/
+**/*.snap
+public/
+coverage/

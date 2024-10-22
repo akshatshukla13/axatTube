@@ -5,21 +5,26 @@ import { ApiError } from "../utils/APIerror.js";
 import { ApiResponse } from "../utils/APIresponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Like } from "../Models/like.model.js";
 
 const getAllVideos = AsyncHandler(async (req, res) => {
   try {
-    const allVideos = await Video.find({}).populate('owner', 'userName email fullName avatar');
+    const allVideos = await Video.find({}).populate(
+      "owner",
+      "userName email fullName avatar"
+    );
 
     if (!allVideos) {
       throw new ApiError(401, "Videos not fetched properly");
     }
 
-    return res.status(201).json(new ApiResponse(200, allVideos, "Videos fetched successfully"));
+    return res
+      .status(201)
+      .json(new ApiResponse(200, allVideos, "Videos fetched successfully"));
   } catch (error) {
     next(error);
   }
 });
-
 
 const publishAVideo = AsyncHandler(async (req, res) => {
   const { title, description } = req.body;
@@ -93,15 +98,26 @@ const getVideoById = AsyncHandler(async (req, res) => {
     throw new ApiError(402, "VideoId required");
   }
 
-  const video = await Video.findById(videoId).populate('owner', 'userName email fullName avatar');
+  const video = await Video.findById(videoId).populate({
+    path: "owner",
+    select: "userName email fullName avatar",
+  });
 
+  const noOfLikes = await Like.countDocuments({ video: video._id });
+  console.log(noOfLikes);
+  
+  const videoObject = video.toObject();
+  videoObject.noOfLikes = noOfLikes;
+
+  console.log(videoObject);
+  
   if (!video) {
     throw new ApiError(401, "Invalid Video Id");
   }
 
   return res
     .status(201)
-    .json(new ApiResponse(200, video, "Video fetched Successfully"));
+    .json(new ApiResponse(200, videoObject, "Video fetched Successfully"));
 });
 
 const updateVideo = AsyncHandler(async (req, res) => {
