@@ -46,11 +46,38 @@ export const fetchPerticularVideoDetails = createAsyncThunk(
   }
 );
 
+//uplaodVideo
+export const uplaodVideo = createAsyncThunk("uplaodVideo", async ({ formData }) => {
+  try {
+    console.log("uploading video");
+    console.log(formData);
+    
+    const response = await axios({
+      method: "post",
+      url: `/api/videos/`,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
+    });
+    console.log("uploaded video");
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log("Err ");
+    const err = parseAxiosError(error.response.data);
+    console.log(err);
+    throw error;
+  }
+});
+
 const initialState = {
   isLoading: false,
   data: null,
   isError: false,
   perticularVideoData: null,
+  uploadedVideo: true,
 };
 
 export const videoSlice = createSlice({
@@ -82,14 +109,29 @@ export const videoSlice = createSlice({
       state.isError = true;
       state.isLoading = false;
     });
+
+    builder.addCase(uplaodVideo.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(uplaodVideo.fulfilled, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(uplaodVideo.rejected, (state, action) => {
+      console.log("Error", action.payload);
+      state.isError = true;
+      state.isLoading = false;
+    });
   },
   reducers: {
     resetPerticularVideo: (state, action) => {
       state.perticularVideoData = null;
     },
+    resetUploadedVideo: (state, action) => {
+      state.uploadedVideo = null;
+    },
   },
 });
 
-export const { resetPerticularVideo } = videoSlice.actions;
+export const { resetPerticularVideo,resetUploadedVideo } = videoSlice.actions;
 
 export default videoSlice.reducer;

@@ -1,19 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UploadVideoPopout from "./UploadPopOut/UploadVideoPopout.jsx";
-
-
+import UploadingVideoPopout from "./UploadPopOut/UploadingVideoPopout.jsx";
+import UploadedSuccess from "./UploadPopOut/UploadedSuccess.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { videoSlice } from "@/app/slices/videoSlice.js";
+import { fetchChannelDetails, fetchChannelVideos } from "@/app/slices/ChannelSlice.js";
 
 function MyChannel({ Compo }) {
   const { username } = useParams();
+  const [uploadPannelVisibility, setUploadPannelVisibility] = useState(false);
+  const uploading = useSelector((state) => state.video.isLoading);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log("Username: ", username);
+    dispatch(fetchChannelDetails({ username }))
+    dispatch(fetchChannelVideos({ username }))
+  }, [])
 
 
-  const visible = true
+  useEffect(() => {
+    if (uploading == true) {
+      setUploadPannelVisibility((e) => !e);
+    }
+  }, [uploading])
 
-  // Step 3: Create a function to toggle visibility
-  const changeVisibility = () => {
-    
-  };
+  const changeVisibilityofVideoUploadPannel = () => {
+    setUploadPannelVisibility((e) => !e);
+  }
 
   const navigate = useNavigate();
 
@@ -65,7 +80,7 @@ function MyChannel({ Compo }) {
                 Edit
               </button>
               <button
-                onClick={changeVisibility}
+                onClick={changeVisibilityofVideoUploadPannel}
                 class="mx-5 group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto"
               >
                 <span class="inline-block w-5"></span>
@@ -118,7 +133,11 @@ function MyChannel({ Compo }) {
           <Compo />
         </div>
         {/* here upload */}
-        {visible && <UploadVideoPopout />}
+        {
+          uploadPannelVisibility && <UploadVideoPopout />
+        }
+        {uploading && <UploadingVideoPopout />}
+        <UploadedSuccess />
       </section>
     </>
   );

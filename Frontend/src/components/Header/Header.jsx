@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import { useEffect } from "react";
 import { fetchUserDetails } from "@/app/slices/userSlice.js";
 import { toast } from "react-toastify";
 import { LogedOutUser, resetAuthData } from "@/app/slices/authSlice";
 import { resetUserData } from "@/app/slices/userSlice.js";
+
 
 function Header() {
   const navigate = useNavigate();

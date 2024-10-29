@@ -47,9 +47,9 @@ const getUserPlaylists = AsyncHandler(async (req, res) => {
     throw new ApiError(200, "user with this userId do not exists");
   }
 
-  const playlistExists = await User.find({ owner: userId });
+  const playlistExists = await Playlist.find({ owner: userId });
 
-  if (playlistExists.length < 1) {
+  if (playlistExists.length <= 1) {
     throw new ApiError(200, "playlist not available");
   }
 

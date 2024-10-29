@@ -29,6 +29,8 @@ export const fetchUserDetails = createAsyncThunk(
 );
 
 const initialState = {
+  userName: null,
+  userId: null,
   isLoading: false,
   data: null,
   isError: false,
@@ -44,6 +46,8 @@ export const userSlice = createSlice({
     builder.addCase(fetchUserDetails.fulfilled, (state, action) => {
       state.isLoading = false;
       state.data = action.payload;
+      state.userName = action.payload.data.userName;
+      state.userName = action.payload.data._id;
     });
     builder.addCase(fetchUserDetails.rejected, (state, action) => {
       console.log("Error");
@@ -52,12 +56,12 @@ export const userSlice = createSlice({
     });
   },
   reducers: {
-    resetUserData : (state,action)=>{
+    resetUserData: (state, action) => {
+      state.userName = null;
       state.data = null;
-    }
+    },
   },
 });
 
-export const { resetUserData } =
-  userSlice.actions;
+export const { resetUserData } = userSlice.actions;
 export default userSlice.reducer;

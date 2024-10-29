@@ -31,6 +31,8 @@ import healthRouter from "./routes/healthcheck.routes.js";
 import commentRoute from "./routes/comment.routes.js";
 import playlistRoute from "./routes/playlist.routes.js";
 import likeRoute from "./routes/like.routes.js";
+import channelRoute from "./routes/dashboard.routes.js";
+import subscribeRoute from "./routes/subscription.routes.js"
 
 app.use("/users", userRouter);
 
@@ -45,5 +47,9 @@ app.use("/comment", commentRoute);
 app.use("/playlist", playlistRoute);
 
 app.use("/like", likeRoute);
+
+app.use("/channel", channelRoute);
+
+app.use("/subscribe" ,subscribeRoute);
 
 export { app };

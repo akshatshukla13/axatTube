@@ -3,8 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { createBrowserRouter, Navigate, Route, RouterProvider, useParams } from "react-router-dom";
-
-
 import AuthLogin from "./components/AuthPages/AuthLogin.jsx";
 import AuthRegister from "./components/AuthPages/AuthRegister.jsx";
 import Header from "./components/Header/Header.jsx";
@@ -92,7 +90,11 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "videos",
+        path: "videos", // Matches "/@/:username/videos"
+        element: <MyChannel Compo={MyChannelVideoPage} />,
+      },
+      {
+        path: "", // Matches "/@/:username" (no additional path)
         element: <MyChannel Compo={MyChannelVideoPage} />,
       },
       {
@@ -112,15 +114,16 @@ const router = createBrowserRouter([
   //
 
   {
-    //perticular video route
-    path: "/video/:id",
-    element: (
-      <>
-        <Header />
-        <VideoDetailPage />
-      </>
-    ),
+    path: "/",
+    element: <Layout />, // Apply Layout here
+    children: [
+      {
+        path: "video/:id",
+        element: <VideoDetailPage />, // VideoDetailPage rendered inside Layout's Outlet
+      },
+    ],
   },
+
 
   //auth routes
   {

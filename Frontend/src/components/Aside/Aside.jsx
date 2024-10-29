@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 function Aside() {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const username = useSelector((state) => state.user.userName);
   const logedin = useSelector((state) => state.user.data);
 
   return (

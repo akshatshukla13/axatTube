@@ -5,7 +5,7 @@ import likeReducer from "./slices/likeSlice";
 import tweetReducer from "./slices/tweetSlice";
 import subscriptionReducer from "./slices/subscriptionSlice";
 import playlistReducer from "./slices/playlistSlice";
-import channelReducer from "./slices/channelSlice.js";
+import channelReducer from "./slices/ChannelSlice.js";
 import commentReducer from './slices/commentSlice'
 import authReducer from './slices/authSlice'
 
