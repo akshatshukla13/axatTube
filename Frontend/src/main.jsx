@@ -2,7 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-import { createBrowserRouter, Navigate, Route, RouterProvider, useParams } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  Route,
+  RouterProvider,
+  useParams,
+} from "react-router-dom";
 import AuthLogin from "./components/AuthPages/AuthLogin.jsx";
 import AuthRegister from "./components/AuthPages/AuthRegister.jsx";
 import Header from "./components/Header/Header.jsx";
@@ -31,10 +37,12 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminDashBoardPage from "./components/MyChannel/AdminPanel/AdminDashBoardPage.jsx";
 import LikeDashboard from "./components/LikeDashBoard/LikeDashboard.jsx";
+import Setting from "./components/ExtrasPage/Setting.jsx";
 
 const router = createBrowserRouter([
+
+  //home route
   {
-    //home route
     path: "/:username",
     element: (
       <>
@@ -47,8 +55,8 @@ const router = createBrowserRouter([
     ),
   },
 
+  //"/" route
   {
-    //home route
     path: "/",
     element: (
       <>
@@ -115,11 +123,15 @@ const router = createBrowserRouter([
         path: "playlist",
         element: <MyChannel Compo={MyChannelPlaylistPage} />,
       },
+      {
+        path: "like",
+        element: <MyChannel Compo={LikeDashboard} />,
+      },
     ],
   },
 
-  //
 
+  // VideoDetailPage
   {
     path: "/",
     element: <Layout />, // Apply Layout here
@@ -131,29 +143,17 @@ const router = createBrowserRouter([
     ],
   },
 
+  //admin dashboard
   {
     path: "/@/:username/dashboard",
     element: <AdminDashBoardPage />,
   },
 
+  //settings
   {
-    //home route
-    path: "/@/:username/like",
-    element: (
-      <>
-        <Header />
-        <div className="flex">
-          <Aside />
-          <LikeDashboard />
-        </div>
-      </>
-    ),
+    path: "/@/:username/setting",
+    element: <Setting />,
   },
-
-  // {
-  //   path: "/@/:username/like",
-  //   element: <LikeDashboard />,
-  // },
 
   //auth routes
   {
@@ -164,58 +164,8 @@ const router = createBrowserRouter([
     path: "/register",
     element: <AuthRegister />,
   },
+
   //
-
-  {
-    //user like route
-    path: "/:username/home",
-    element: <EditPersonalPageInfo />,
-  },
-
-  {
-    path: "/:username/like",
-    element: <Terms />,
-  },
-
-  {
-    path: "/:username/mycontent",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/:username/history",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/:username/dashboard",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/:username/subscriptions",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/:username/support",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/:username/setting",
-    element: <PrivacyPolicy />,
-  },
-
-  {
-    path: "/terms",
-    element: <Terms />,
-  },
-
-  {
-    path: "/privacyPolicy",
-    element: <PrivacyPolicy />,
-  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

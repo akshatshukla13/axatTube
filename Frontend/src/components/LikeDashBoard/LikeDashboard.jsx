@@ -31,7 +31,7 @@ function LikeDashboard() {
                                         </span>
                                     </div>
                                 </div>
-                                <div class="border  flex gap-x-2 md:w-10/12">
+                                <div class="flex gap-x-2 md:w-10/12">
                                     <div class="h-10 w-10 shrink-0 md:hidden">
                                         <img
                                             src={vids.video.owner.avatar}

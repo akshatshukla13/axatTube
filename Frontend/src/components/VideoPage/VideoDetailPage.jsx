@@ -383,7 +383,7 @@ function VideoDetailPage() {
 
                       {/* subscriber subscribed area starts */}
                       <div class="mt-4 flex items-center justify-between">
-                        <div onClick={()=>{navigate(`/channel/${videoData.data.owner.userName}` );}} class="border border-red-500 flex items-center gap-x-4">
+                        <div onClick={() => { navigate(`/channel/${videoData.data.owner.userName}`); }} class="border border-red-500 flex items-center gap-x-4">
                           <div class=" mt-2 h-12 w-12 shrink-0">
                             <img
                               src={videoData.data.owner.avatar}

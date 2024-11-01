@@ -14,10 +14,8 @@ function Header() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    //fetch current user, if avail then make logedin user right
-    // console.log("hello hello");
     dispatch(fetchUserDetails());
-  }, []);
+  }, [logedin]);
 
   return (
     <header class="sticky inset-x-0 top-0 z-50 w-full border-b border-white bg-[#121212] px-4">
