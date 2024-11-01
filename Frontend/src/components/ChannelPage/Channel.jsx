@@ -1,92 +1,36 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import ChannelPlayListVideosPage from "./ChannelPlayListVideosPage";
-import ChannelTweetPage from "./ChannelTweetPage";
-import ChannelSubscribedPage from "./ChannelSubscribedPage";
-import ChannelVideoListPage from "./ChannelVideoListPage";
-import { useNavigate, useParams } from "react-router-dom";
+
+
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchChannelDetails, fetchChannelPlaylists, fetchChannelTweets, fetchChannelVideos, fetchSubscribedChannels } from "@/app/slices/channelSlice";
 
 function Channel({ Compo }) {
-  const {username} = useParams()
+  const { username } = useParams()
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    console.log("Username: ", username);
+    dispatch(fetchChannelDetails({ username }))
+    dispatch(fetchChannelVideos({ username }))
+    dispatch(fetchChannelTweets({ username }))
+    dispatch(fetchChannelPlaylists({ username }))
+    dispatch(fetchSubscribedChannels({ username }))
+  }, [])
+
+
+  const channelDetails = useSelector((state) => state.channel.channelData);
 
   return (
+    channelDetails &&
     <>
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1092424/pexels-photo-1092424.jpeg?auto=compress"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1115816/pexels-photo-1115816.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/3561339/pexels-photo-3561339.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/2519817/pexels-photo-2519817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1739849/pexels-photo-1739849.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1739854/pexels-photo-1739854.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144256/pexels-photo-1144256.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144260/pexels-photo-1144260.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144276/pexels-photo-1144276.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144274/pexels-photo-1144274.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144231/pexels-photo-1144231.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1144250/pexels-photo-1144250.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1115824/pexels-photo-1115824.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="https://images.pexels.com/photos/1115808/pexels-photo-1115808.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-
       <section class="bg-[#121212] text-white w-full pb-[70px] sm:ml-[70px] sm:pb-0 lg:ml-0">
         <div class="relative min-h-[150px] w-full pt-[16.28%]">
           <div class="absolute inset-0 overflow-hidden">
             <img
-              src="https://images.pexels.com/photos/1092424/pexels-photo-1092424.jpeg?auto=compress"
+              src={channelDetails.ChannelDetails.coverImage}
               alt="cover-photo"
             />
           </div>
@@ -95,16 +39,16 @@ function Channel({ Compo }) {
           <div class="flex flex-wrap gap-4 pb-4 pt-6">
             <span class="relative -mt-12 inline-block h-28 w-28 shrink-0 overflow-hidden rounded-full border-2">
               <img
-                src="https://images.pexels.com/photos/1115816/pexels-photo-1115816.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                src={channelDetails.ChannelDetails.avatar}
                 alt="Channel"
                 class="h-full w-full"
               />
             </span>
             <div class="mr-auto inline-block">
-              <h1 class="font-bolg text-xl">React Patterns</h1>
-              <p class="text-sm text-gray-400">@reactpatterns</p>
+              <h1 class="font-bolg text-xl">{channelDetails.ChannelDetails.fullName}</h1>
+              <p class="text-sm text-gray-400">{"@" + channelDetails.ChannelDetails.userName}</p>
               <p class="text-sm text-gray-400">
-                600k Subscribers · 220 Subscribed
+                {channelDetails.totalSubscribers} Subscribers · {channelDetails.totalVideos} Videos
               </p>
             </div>
             <div class="inline-block">
@@ -133,62 +77,61 @@ function Channel({ Compo }) {
             </div>
           </div>
           <ul class="no-scrollbar sticky top-[66px] z-[2] flex flex-row gap-x-2 overflow-auto border-b-2 border-gray-400 bg-[#121212] py-2 sm:top-[82px]">
-            <li class="w-full">
-              <button
-                onClick={() => {
-                  navigate("/channel/"+username+"/videos");
-                }}
-                class="w-full border-b-2 border-[#ae7aff] bg-white px-3 py-1.5 text-[#ae7aff]"
-              >
-                Videos
-              </button>
-            </li>
-            <li class="w-full">
-              <button
-                onClick={() => {
-                  navigate("/channel/"+username+"/playlist");
-                }}
-                class="w-full border-b-2 border-transparent px-3 py-1.5 text-gray-400"
-              >
-                Playlist
-              </button>
-            </li>
-            <li class="w-full">
-              <button
-                onClick={() => {
-                  navigate("/channel/"+username+"/tweet");
-                }}
-                class="  w-full border-b-2 border-transparent px-3 py-1.5 text-gray-400"
-              >
-                Tweets
-              </button>
-            </li>
-            <li class="w-full">
-              <button
-                onClick={() => {
-                  navigate("/channel/"+username+"/subscribed");
-                }}
-                class="  w-full border-b-2 border-transparent px-3 py-1.5 text-gray-400"
-              >
-                Subscribed
-              </button>
-            </li>
+            <NavLink
+              to={`/channel/${username}/videos`}
+              className={({ isActive }) =>
+                `w-full border-b-2 px-3 py-1.5 ${isActive ? 'bg-[#e0e0e0] text-[#5a00b3] border-[#5a00b3]' : 'bg-transparent text-gray-700 border-gray-300'
+                }`
+              }
+            >
+              <li className="w-full">
+                <button
+                  onClick={() => {
+                    navigate(`/@/${username}/videos`);
+                  }}
+                  className="w-full"
+                >
+                  Videos
+                </button>
+              </li>
+            </NavLink>
+            <NavLink
+              to={`/channel/${username}/playlist`}
+              className={({ isActive }) =>
+                `w-full border-b-2 px-3 py-1.5 ${isActive ? 'bg-[#e0e0e0] text-[#5a00b3] border-[#5a00b3]' : 'bg-transparent text-gray-700 border-gray-300'
+                }`
+              }
+            >
+              <li className="w-full">
+                <button className="w-full">Playlist</button>
+              </li>
+            </NavLink>
+
+            <NavLink
+              to={`/channel/${username}/tweet`}
+              className={({ isActive }) =>
+                `w-full border-b-2 px-3 py-1.5 ${isActive ? 'bg-[#e0e0e0] text-[#5a00b3] border-[#5a00b3]' : 'bg-transparent text-gray-700 border-gray-300'
+                }`
+              }
+            >
+              <li className="w-full">
+                <button className="w-full">Tweets</button>
+              </li>
+            </NavLink>
+
+            <NavLink
+              to={`/channel/${username}/subscribed`}
+              className={({ isActive }) =>
+                `w-full border-b-2 px-3 py-1.5 ${isActive ? 'bg-[#e0e0e0] text-[#5a00b3] border-[#5a00b3]' : 'bg-transparent text-gray-700 border-gray-300'
+                }`
+              }
+            >
+              <li className="w-full">
+                <button className="w-full">Subscribed</button>
+              </li>
+            </NavLink>
           </ul>
-          {/* video section */}
-          {/* <ChannelVideoListPage/> */}
-          {/* video section ends */}
 
-          {/* playlist section */}
-          {/* <ChannelPlayListVideosPage/> */}
-          {/* playlist section */}
-
-          {/* tweet section */}
-          {/* <ChannelTweetPage/> */}
-          {/* tweet section */}
-
-          {/* subed section */}
-          {/* <ChannelSubscribedPage/> */}
-          {/* subed section */}
 
           <Compo />
         </div>

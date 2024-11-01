@@ -5,9 +5,10 @@ import likeReducer from "./slices/likeSlice";
 import tweetReducer from "./slices/tweetSlice";
 import subscriptionReducer from "./slices/subscriptionSlice";
 import playlistReducer from "./slices/playlistSlice";
-import channelReducer from "./slices/ChannelSlice.js";
+import myChannelReducer from "./slices/myChannelSlice";
 import commentReducer from './slices/commentSlice'
 import authReducer from './slices/authSlice'
+import channelReducer from './slices/channelSlice'
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     subscription: subscriptionReducer,
     playlist: playlistReducer,
     channel: channelReducer,
+    myChannel: myChannelReducer,
   },
 });

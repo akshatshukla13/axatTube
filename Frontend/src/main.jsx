@@ -29,6 +29,8 @@ import PrivacyPolicy from "./components/ExtrasPage/PrivacyPolicy.jsx";
 import Layout from "./Outlet/Layout.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AdminDashBoardPage from "./components/MyChannel/AdminPanel/AdminDashBoardPage.jsx";
+import LikeDashboard from "./components/LikeDashBoard/LikeDashboard.jsx";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +67,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
+        path: "",
+        element: <Channel Compo={ChannelVideoListPage} />,
+      },
+      {
         path: "videos",
         element: <Channel Compo={ChannelVideoListPage} />,
       },
@@ -78,7 +84,7 @@ const router = createBrowserRouter([
       },
       {
         path: "playlist",
-        element: <Channel Compo={ChannelPlayListVideosPage} />,
+        element: <Channel Compo={ChannelPlayListPage} />,
       },
     ],
   },
@@ -111,6 +117,7 @@ const router = createBrowserRouter([
       },
     ],
   },
+
   //
 
   {
@@ -124,6 +131,29 @@ const router = createBrowserRouter([
     ],
   },
 
+  {
+    path: "/@/:username/dashboard",
+    element: <AdminDashBoardPage />,
+  },
+
+  {
+    //home route
+    path: "/@/:username/like",
+    element: (
+      <>
+        <Header />
+        <div className="flex">
+          <Aside />
+          <LikeDashboard />
+        </div>
+      </>
+    ),
+  },
+
+  // {
+  //   path: "/@/:username/like",
+  //   element: <LikeDashboard />,
+  // },
 
   //auth routes
   {
@@ -158,7 +188,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/:username/collections",
+    path: "/:username/dashboard",
     element: <PrivacyPolicy />,
   },
 
@@ -174,6 +204,16 @@ const router = createBrowserRouter([
 
   {
     path: "/:username/setting",
+    element: <PrivacyPolicy />,
+  },
+
+  {
+    path: "/terms",
+    element: <Terms />,
+  },
+
+  {
+    path: "/privacyPolicy",
     element: <PrivacyPolicy />,
   },
 ]);

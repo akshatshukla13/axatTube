@@ -419,7 +419,7 @@ function EmptyVideoPage() {
                   </svg>
                 </span>
                 <span class="block sm:hidden sm:group-hover:inline lg:inline">
-                  Collections
+                  Dashboard
                 </span>
               </button>
             </li>
