@@ -12,7 +12,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': "https://videotube-two.vercel.app", // Ensure this endpoint is correct
+      '/api': {
+        target: 'https://videotube-two.vercel.app',
+        changeOrigin: true, // This is important for virtual hosted sites
+        rewrite: (path) => path.replace(/^\/api/, ''), // This removes the /api prefix before forwarding
+      },
     },
   },
 });
