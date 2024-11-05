@@ -9,7 +9,7 @@ dotenv.config({ path: "./.env" });
 connectDB()
   .then(() => {
     app.get("/", (req, res) => {
-      res.send("Hello World!");
+      res.send("Hello Worldd!");
     });
 
     const PORT = process.env.PORT || 5000;
