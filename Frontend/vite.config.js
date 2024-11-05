@@ -12,9 +12,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://videotube-two.vercel.app',
+        target: 'https://videotube-two.vercel.app/videos/',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''), // This line can be removed if you want to send the request directly to the target URL
       },
     },
   },
