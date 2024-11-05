@@ -10,7 +10,7 @@ export const fetchMyChannelDetails = createAsyncThunk(
       console.log("doing fetchMyChannelDetails ", username);
       const response = await axios({
         method: "post",
-        url: `/api/channel/stats/${username}`,
+        url: `https://videotube-two.vercel.app/channel/stats/${username}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -31,7 +31,7 @@ export const fetchMyChannelVideos = createAsyncThunk(
       console.log("doing fetchMyChannelVideos ", username);
       const response = await axios({
         method: "post",
-        url: `/api/channel/videos/${username}`,
+        url: `https://videotube-two.vercel.app/channel/videos/${username}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -52,7 +52,7 @@ export const fetchMyChannelPlaylists = createAsyncThunk(
       console.log("doing fetchMyChannelPlaylists ", username);
       const response = await axios({
         method: "get",
-        url: `/api/playlist/user/${username}`,
+        url: `https://videotube-two.vercel.app/playlist/user/${username}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -73,7 +73,7 @@ export const fetchMyChannelTweets = createAsyncThunk(
       console.log("doing fetchMyChannelTweets ", username);
       const response = await axios({
         method: "get",
-        url: `/api/tweet/user/${username}`,
+        url: `https://videotube-two.vercel.app/tweet/user/${username}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -94,7 +94,7 @@ export const fetchMySubscribedChannels = createAsyncThunk(
       console.log("doing fetchMySubscribedChannels ", username);
       const response = await axios({
         method: "get",
-        url: `/api/subscribe/c/${username}`,
+        url: `https://videotube-two.vercel.app/subscribe/c/${username}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);

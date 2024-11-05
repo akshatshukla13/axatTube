@@ -8,7 +8,7 @@ export const fetchLikedVideos = createAsyncThunk(
       // console.log("doing fetchLikedVideos ",id);
       const response = await axios({
         method: "get",
-        url: `/api/like/videos`,
+        url: `https://videotube-two.vercel.app/like/videos`,
         withCredentials: true,
       });
       // console.log("comment : ",response.data);

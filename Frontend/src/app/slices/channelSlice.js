@@ -10,14 +10,14 @@ export const fetchChannelDetails = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `/api/users/uid/${username}`,
+        url: `https://videotube-two.vercel.app/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelDetails ", userId.data);
       const response = await axios({
         method: "post",
-        url: `/api/channel/stats/${userId.data}`,
+        url: `https://videotube-two.vercel.app/channel/stats/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -38,14 +38,14 @@ export const fetchChannelVideos = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `/api/users/uid/${username}`,
+        url: `https://videotube-two.vercel.app/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId for videos", userId.data);
       console.log("doing fetchChannelVideos ", userId.data);
       const response = await axios({
         method: "post",
-        url: `/api/channel/videos/${userId.data}`,
+        url: `https://videotube-two.vercel.app/channel/videos/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -66,14 +66,14 @@ export const fetchChannelPlaylists = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `/api/users/uid/${username}`,
+        url: `https://videotube-two.vercel.app/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelPlaylists ", userId.data.data);
       const response = await axios({
         method: "get",
-        url: `/api/playlist/user/${userId.data}`,
+        url: `https://videotube-two.vercel.app/playlist/user/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -94,14 +94,14 @@ export const fetchChannelTweets = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `/api/users/uid/${username}`,
+        url: `https://videotube-two.vercel.app/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelTweets ", userId.data);
       const response = await axios({
         method: "get",
-        url: `/api/tweet/user/${userId.data}`,
+        url: `https://videotube-two.vercel.app/tweet/user/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -122,14 +122,14 @@ export const fetchSubscribedChannels = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `/api/users/uid/${username}`,
+        url: `https://videotube-two.vercel.app/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchSubscribedChannels ", userId.data);
       const response = await axios({
         method: "get",
-        url: `/api/subscribe/c/${userId.data}`,
+        url: `https://videotube-two.vercel.app/subscribe/c/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);

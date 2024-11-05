@@ -9,10 +9,10 @@ export const fetchUserDetails = createAsyncThunk(
   async () => {
     try {
       console.log("doing");
-      // const response = await axios.get("/api/users/current-user/");
+      // const response = await axios.get("https://videotube-two.vercel.app/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "/api/users/current-user/",
+        url: "https://videotube-two.vercel.app/users/current-user/",
         withCredentials: true,
       });
       // toast.success("welcome," + response.data.data.userName);

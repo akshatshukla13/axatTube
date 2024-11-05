@@ -23,7 +23,7 @@ function VideoDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("/api/videos/");
+        const response = await axios.get("https://videotube-two.vercel.app/videos/");
         const data = await response.data.data;
         setSideVideoData(data);
       } catch (error) {
@@ -45,7 +45,7 @@ function VideoDetailPage() {
     if (comment.trim() != "") {
       const resp = await axios({
         method: "post",
-        url: `/api/comment/${videoData.data._id}`,
+        url: `https://videotube-two.vercel.app/comment/${videoData.data._id}`,
         data: formData,
         withCredentials: true,
       });
@@ -61,7 +61,7 @@ function VideoDetailPage() {
     setLike(videoData.data.noOfLikes + 1);
     const resp = await axios({
       method: "post",
-      url: `/api/like/toggle/v/${videoData.data._id}`,
+      url: `https://videotube-two.vercel.app/like/toggle/v/${videoData.data._id}`,
       withCredentials: true,
     });
   }

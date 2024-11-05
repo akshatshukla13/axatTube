@@ -9,7 +9,7 @@ export const fetchVideoComments = createAsyncThunk(
       // console.log("doing fetchVideoComments ",id);
       const response = await axios({
         method: "get",
-        url: `/api/comment/${id}`,
+        url: `https://videotube-two.vercel.app/comment/${id}`,
         withCredentials: true,
       });
       // console.log("comment : ",response.data);
