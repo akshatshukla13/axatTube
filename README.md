@@ -1,9 +1,6 @@
 STATUS: WORK IN PROGRESS!!!
 Note: Due to deployment on Render, the server may take up to 5 minutes to start initially.
-[https://backnfront.vercel.app/](https://axat-tube.vercel.app/) (client)
-
-
-[backnfront.vercel.app/](https://backnfront.vercel.app/) (server)
+https://videotubev2.vercel.app/ (client)
 
 
 # Video Hosting Website Backend
