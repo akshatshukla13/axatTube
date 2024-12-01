@@ -1,5 +1,5 @@
 STATUS: WORK IN PROGRESS!!!
-Note: Due to deployment on Render, the server may take up to 5 minutes to start initially.
+
 https://videotubev2.vercel.app/ (client)
 
 
