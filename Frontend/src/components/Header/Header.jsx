@@ -12,17 +12,18 @@ function Header() {
   const navigate = useNavigate();
   const logedin = useSelector((state) => state.user.data);
   const dispatch = useDispatch();
+  const username = useSelector((state) => state.user.userName);
 
   useEffect(() => {
     dispatch(fetchUserDetails());
-  }, [logedin]);
+  }, []);
 
   return (
     <header class="sticky inset-x-0 top-0 z-50 w-full border-b border-white bg-[#121212] px-4">
       <nav class="mx-auto flex max-w-7xl items-center py-2 ">
         <div
           onClick={() => {
-            navigate("/" + logedin.data.userName);
+            navigate("/" );
           }}
           class="fixed mr-4 w-12 shrink-0 sm:w-16"
         >
@@ -228,7 +229,9 @@ function Header() {
                   </button>
                 </li>
                 <li class="w-full">
-                  <button class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
+                  <button onClick={() => {
+                    navigate("/@/" + username + "/videos");
+                  }} class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
                     <span class="inline-block w-full max-w-[20px] group-hover:mr-4 lg:mr-4">
                       <svg
                         style={{ width: "100%" }}
@@ -366,9 +369,11 @@ function Header() {
               <span class="block h-[2px] w-full bg-white group-hover:bg-[#ae7aff]"></span>
             </button>
 
-            <div class="fixed inset-y-0 right-0 flex w-full max-w-xs shrink-0 translate-x-full flex-col border-l border-white bg-[#121212] duration-200 hover:translate-x-0 peer-focus:translate-x-0 sm:static sm:ml-4 sm:w-auto sm:translate-x-0 sm:border-none">
-              <div class="relative flex w-full items-center justify-between border-b border-white px-4 py-2 sm:hidden">
-                <span class="inline-block w-12">
+            <div class=" fixed inset-y-0 right-0 flex w-full max-w-xs shrink-0 translate-x-full flex-col border-l border-white bg-[#121212] duration-200 hover:translate-x-0 peer-focus:translate-x-0 sm:static sm:ml-4 sm:w-auto sm:translate-x-0 sm:border-none">
+              <div onClick={() => {
+                navigate("/");
+              }} class="relative flex w-full items-center justify-between border-b border-white px-4 py-2 sm:hidden">
+                <span class=" inline-block w-12">
                   <svg
                     //   style={{width: '100%'}}
                     style={{ width: "100%" }}
@@ -443,57 +448,7 @@ function Header() {
               </div>
 
               <ul class="text-white my-4 flex w-full flex-wrap gap-2 px-4 sm:hidden">
-                <li class="w-full">
-                  <button class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                    <span class="inline-block w-full max-w-[20px] group-hover:mr-4 lg:mr-4">
-                      <svg
-                        //   style={{width: '100%'}}
-                        style={{ width: "100%" }}
-                        viewBox="0 0 22 22"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6 21V10M1 12V19C1 20.1046 1.89543 21 3 21H16.4262C17.907 21 19.1662 19.9197 19.3914 18.4562L20.4683 11.4562C20.7479 9.6389 19.3418 8 17.5032 8H14C13.4477 8 13 7.55228 13 7V3.46584C13 2.10399 11.896 1 10.5342 1C10.2093 1 9.91498 1.1913 9.78306 1.48812L6.26394 9.40614C6.10344 9.76727 5.74532 10 5.35013 10H3C1.89543 10 1 10.8954 1 12Z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        ></path>
-                      </svg>
-                    </span>
-                    <span>Liked Videos</span>
-                  </button>
-                </li>
-                <li class="w-full">
-                  <button class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                    <span class="inline-block w-full max-w-[20px] group-hover:mr-4 lg:mr-4">
-                      <svg
-                        //   style={{width: '100%'}}
-                        style={{ width: "100%" }}
-                        viewBox="0 0 22 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M21 4.93137C21 4.32555 21 4.02265 20.8802 3.88238C20.7763 3.76068 20.6203 3.69609 20.4608 3.70865C20.2769 3.72312 20.0627 3.93731 19.6343 4.36569L16 8L19.6343 11.6343C20.0627 12.0627 20.2769 12.2769 20.4608 12.2914C20.6203 12.3039 20.7763 12.2393 20.8802 12.1176C21 11.9774 21 11.6744 21 11.0686V4.93137Z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        ></path>
-                        <path
-                          d="M1 5.8C1 4.11984 1 3.27976 1.32698 2.63803C1.6146 2.07354 2.07354 1.6146 2.63803 1.32698C3.27976 1 4.11984 1 5.8 1H11.2C12.8802 1 13.7202 1 14.362 1.32698C14.9265 1.6146 15.3854 2.07354 15.673 2.63803C16 3.27976 16 4.11984 16 5.8V10.2C16 11.8802 16 12.7202 15.673 13.362C15.3854 13.9265 14.9265 14.3854 14.362 14.673C13.7202 15 12.8802 15 11.2 15H5.8C4.11984 15 3.27976 15 2.63803 14.673C2.07354 14.3854 1.6146 13.9265 1.32698 13.362C1 12.7202 1 11.8802 1 10.2V5.8Z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        ></path>
-                      </svg>
-                    </span>
-                    <span>My Content</span>
-                  </button>
-                </li>
+
                 <li class="w-full">
                   <button class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
                     <span class="inline-block w-full max-w-[20px] group-hover:mr-4 lg:mr-4">

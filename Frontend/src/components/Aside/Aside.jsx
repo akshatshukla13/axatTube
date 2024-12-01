@@ -14,7 +14,7 @@ function Aside() {
         <li class="">
           <button
             onClick={() => {
-              navigate("/" + logedin.data.userName);
+              navigate("/");
             }}
             class="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black sm:group-hover:justify-start sm:group-hover:px-4 lg:justify-start lg:px-4"
           >
@@ -97,7 +97,7 @@ function Aside() {
                 ></path>
               </svg>
             </span>
-            <span class="block sm:hidden sm:group-hover:inline lg:inline">
+            <span onClick={() => { navigate("/@/" + username + "/history"); }} class="block sm:hidden sm:group-hover:inline lg:inline">
               History
             </span>
           </button>
@@ -160,7 +160,9 @@ function Aside() {
                 ></path>
               </svg>
             </span>
-            <span class="block sm:hidden sm:group-hover:inline lg:inline">
+            <span onClick={() => {
+              navigate("/@/" + username + "/dashboard");
+            }} class="block sm:hidden sm:group-hover:inline lg:inline">
               Dashboard
             </span>
           </button>
