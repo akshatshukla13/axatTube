@@ -48,8 +48,6 @@ const registerUser = AsyncHandler(async (req, res) => {
     req.files.coverImage.length > 0
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
-  } else {
-    throw new ApiError(409, 'No cover');
   }
 
   let avatarLocalPath;
@@ -59,20 +57,25 @@ const registerUser = AsyncHandler(async (req, res) => {
     req.files.avatar.length > 0
   ) {
     avatarLocalPath = req.files.avatar[0].path;
-  } else {
-    throw new ApiError(409, 'NO avatar');
   }
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  let avatar = null;
+  let coverImage = null;
 
-  if (!avatar) {
-    throw new ApiError(409, 'avatar url required');
+  if (avatarLocalPath) {
+    avatar = await uploadOnCloudinary(avatarLocalPath);
   }
+
+  if (coverImageLocalPath) {
+    coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  }
+
+  // Use default avatar if none provided
+  const avatarUrl = avatar?.url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
 
   const user = await User.create({
     fullName,
-    avatar: avatar.url,
+    avatar: avatarUrl,
     coverImage: coverImage?.url || '',
     email,
     password,

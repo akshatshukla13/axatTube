@@ -1,10 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { RegisterUser } from "@/app/slices/authSlice";
 
 function AuthRegister() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading } = useSelector((state) => state.auth);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    fullName: "",
+    userName: "",
+  });
+
+  const [files, setFiles] = useState({
+    avatar: null,
+    coverImage: null,
+  });
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files: fileList } = e.target;
+    if (fileList && fileList[0]) {
+      setFiles((prev) => ({
+        ...prev,
+        [name]: fileList[0],
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.email || !formData.password || !formData.fullName || !formData.userName) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const result = await dispatch(
+        RegisterUser({
+          ...formData,
+          avatar: files.avatar,
+          coverImage: files.coverImage,
+        })
+      ).unwrap();
+
+      if (result) {
+        alert("Registration successful! Please login.");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+
   return (
-    <div class="h-screen overflow-y-auto bg-[#121212] text-white">
-      <div class="mx-auto my-8 flex w-full max-w-sm flex-col px-4">
-        <div class="mx-auto inline-block w-16">
+    <div className="h-screen overflow-y-auto bg-[#121212] text-white">
+      <div className="mx-auto my-8 flex w-full max-w-sm flex-col px-4">
+        <div className="mx-auto inline-block w-16">
           <svg
             style={{ width: "100%" }}
             viewBox="0 0 63 64"
@@ -59,21 +122,110 @@ function AuthRegister() {
             </defs>
           </svg>
         </div>
-        <div class="mb-6 w-full text-center text-2xl font-semibold uppercase">
-          Play
+        <div className="mb-6 w-full text-center text-2xl font-semibold uppercase">
+          Sign Up
         </div>
-        <label for="email" class="mb-1 inline-block text-gray-300">
-          Email*
-        </label>
-        <input
-          id="email"
-          type="email"
-          placeholder="Enter your email"
-          class="mb-4 rounded-lg border bg-transparent px-3 py-2"
-        />
-        <button class="bg-[#ae7aff] px-4 py-3 text-black">
-          Sign up with Email
-        </button>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label htmlFor="fullName" className="mb-1 inline-block text-gray-300">
+              Full Name*
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              placeholder="Enter your full name"
+              value={formData.fullName}
+              onChange={handleInputChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white placeholder-gray-400 focus:border-[#ae7aff] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="userName" className="mb-1 inline-block text-gray-300">
+              Username*
+            </label>
+            <input
+              id="userName"
+              type="text"
+              placeholder="Enter your username"
+              value={formData.userName}
+              onChange={handleInputChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white placeholder-gray-400 focus:border-[#ae7aff] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="mb-1 inline-block text-gray-300">
+              Email*
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white placeholder-gray-400 focus:border-[#ae7aff] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="mb-1 inline-block text-gray-300">
+              Password*
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white placeholder-gray-400 focus:border-[#ae7aff] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="avatar" className="mb-1 inline-block text-gray-300">
+              Avatar (Optional)
+            </label>
+            <input
+              id="avatar"
+              name="avatar"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white file:mr-2 file:rounded file:border-0 file:bg-[#ae7aff] file:px-3 file:py-1 file:text-black"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="coverImage" className="mb-1 inline-block text-gray-300">
+              Cover Image (Optional)
+            </label>
+            <input
+              id="coverImage"
+              name="coverImage"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full rounded-lg border border-gray-600 bg-transparent px-3 py-2 text-white file:mr-2 file:rounded file:border-0 file:bg-[#ae7aff] file:px-3 file:py-1 file:text-black"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="mt-2 rounded-lg bg-[#ae7aff] px-4 py-3 font-semibold text-black transition duration-200 hover:bg-[#9d68ff] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Creating Account..." : "Sign Up"}
+          </button>
+        </form>
+
+        <div className="mt-4 text-center text-gray-400">
+          Already have an account?{" "}
+          <a href="/login" className="text-[#ae7aff] hover:underline">
+            Login here
+          </a>
+        </div>
       </div>
     </div>
   );

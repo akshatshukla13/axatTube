@@ -4,6 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPerticularVideoDetails } from "@/app/slices/videoSlice";
 import { fetchVideoComments } from "@/app/slices/commentSlice";
+import API_BASE_URL from "@/config/api.config";
 
 function VideoDetailPage() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ function VideoDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("https://videotube-two.vercel.app/videos/");
+        const response = await axios.get(`${API_BASE_URL}/videos/`);
         const data = await response.data.data;
         setSideVideoData(data);
       } catch (error) {
@@ -45,7 +46,7 @@ function VideoDetailPage() {
     if (comment.trim() != "") {
       const resp = await axios({
         method: "post",
-        url: `https://videotube-two.vercel.app/comment/${videoData.data._id}`,
+        url: `${API_BASE_URL}/comment/${videoData.data._id}`,
         data: formData,
         withCredentials: true,
       });
@@ -61,7 +62,7 @@ function VideoDetailPage() {
     setLike(videoData.data.noOfLikes + 1);
     const resp = await axios({
       method: "post",
-      url: `https://videotube-two.vercel.app/like/toggle/v/${videoData.data._id}`,
+      url: `${API_BASE_URL}/like/toggle/v/${videoData.data._id}`,
       withCredentials: true,
     });
   }

@@ -2,15 +2,55 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 import parseAxiosError from "@/utils/errorUtil";
+import API_BASE_URL from "@/config/api.config";
 
 //actions
+export const RegisterUser = createAsyncThunk(
+  "RegisterUser",
+  async ({ email, password, fullName, userName, avatar, coverImage }) => {
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("fullName", fullName);
+      formData.append("userName", userName);
+      
+      if (avatar) {
+        formData.append("avatar", avatar);
+      }
+      if (coverImage) {
+        formData.append("coverImage", coverImage);
+      }
+
+      const response = await axios({
+        method: "post",
+        url: `${API_BASE_URL}/users/register/`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      toast.success("Registration Successful!");
+      console.log("User registered:", response.data.data.user.fullName);
+      return response.data;
+    } catch (error) {
+      console.log("Err ");
+      const err = parseAxiosError(error.response.data);
+      console.log(err);
+      toast.error(err);
+      throw error;
+    }
+  }
+);
+
 export const LogedInUser = createAsyncThunk(
   "LogedInUser",
   async ({ email, password }) => {
     try {
       const response = await axios({
         method: "post",
-        url: "https://videotube-two.vercel.app/users/login/",
+        url: `${API_BASE_URL}/users/login/`,
         data: {
           email: email,
           password: password,
@@ -38,7 +78,7 @@ export const LogedOutUser = createAsyncThunk("LogedOutUser", async () => {
   try {
     const response = await axios({
       method: "post",
-      url: "https://videotube-two.vercel.app/users/logout/",
+      url: `${API_BASE_URL}/users/logout/`,
       withCredentials: true,
     });
     toast.success("LogedOut");
@@ -63,6 +103,21 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   extraReducers: (builder) => {
+    builder.addCase(RegisterUser.pending, (state, action) => {
+      console.log("register pending");
+      state.isLoading = true;
+    });
+    builder.addCase(RegisterUser.fulfilled, (state, action) => {
+      console.log("register done");
+      state.isLoading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(RegisterUser.rejected, (state, action) => {
+      console.log("Register Error...");
+      state.isError = true;
+      state.isLoading = false;
+    });
+
     builder.addCase(LogedInUser.pending, (state, action) => {
       console.log("pend");
       state.isLoading = true;

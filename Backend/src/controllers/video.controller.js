@@ -22,7 +22,7 @@ const getAllVideos = AsyncHandler(async (req, res) => {
       .status(201)
       .json(new ApiResponse(200, allVideos, "Videos fetched successfully"));
   } catch (error) {
-    next(error);
+    throw error;
   }
 });
 

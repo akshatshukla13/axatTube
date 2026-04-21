@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import API_BASE_URL from "@/config/api.config";
 
 //action
 export const fetchVideoDetails = createAsyncThunk(
@@ -10,7 +11,7 @@ export const fetchVideoDetails = createAsyncThunk(
       // const response = await axios.get("https://videotube-two.vercel.app/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "https://videotube-two.vercel.app/videos/",
+        url: `${API_BASE_URL}/videos/`,
         withCredentials: true,
       });
       console.log(response.data);
@@ -31,7 +32,7 @@ export const fetchPerticularVideoDetails = createAsyncThunk(
       console.log("doing pv");
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/videos/${id}`,
+        url: `${API_BASE_URL}/videos/${id}`,
         withCredentials: true,
       });
       // console.log("pvv fetched");
@@ -54,7 +55,7 @@ export const uplaodVideo = createAsyncThunk("uplaodVideo", async ({ formData }) 
     
     const response = await axios({
       method: "post",
-      url: `https://videotube-two.vercel.app/videos/`,
+      url: `${API_BASE_URL}/videos/`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",

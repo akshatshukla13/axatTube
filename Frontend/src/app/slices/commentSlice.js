@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import API_BASE_URL from "@/config/api.config";
 
 //actions
 export const fetchVideoComments = createAsyncThunk(
@@ -9,7 +10,7 @@ export const fetchVideoComments = createAsyncThunk(
       // console.log("doing fetchVideoComments ",id);
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/comment/${id}`,
+        url: `${API_BASE_URL}/comment/${id}`,
         withCredentials: true,
       });
       // console.log("comment : ",response.data);

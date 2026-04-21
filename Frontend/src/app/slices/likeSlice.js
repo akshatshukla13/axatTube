@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import API_BASE_URL from "@/config/api.config";
 
 export const fetchLikedVideos = createAsyncThunk(
   "fetchLikedVideos",
@@ -8,7 +9,7 @@ export const fetchLikedVideos = createAsyncThunk(
       // console.log("doing fetchLikedVideos ",id);
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/like/videos`,
+        url: `${API_BASE_URL}/like/videos`,
         withCredentials: true,
       });
       // console.log("comment : ",response.data);

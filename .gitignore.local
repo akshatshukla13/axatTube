@@ -1,0 +1,49 @@
+# Environment Files
+.env                  # ⚠️ NEVER commit - contains local/prod secrets
+.env.prod             # ⚠️ NEVER commit - contains production credentials
+.env.*.local          # Local environment overrides
+
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log
+yarn-error.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Build Output
+dist/
+build/
+.next/
+
+# Logs
+logs/
+*.log
+
+# Temporary Files
+temp/
+tmp/
+*.tmp
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+mongodb.log
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment
+.env.local            # ✓ SAFE to commit - contains only defaults
+.env.example          # ✓ SAFE to commit - template file

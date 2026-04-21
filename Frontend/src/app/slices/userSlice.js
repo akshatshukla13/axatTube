@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 import parseAxiosError from "@/utils/errorUtil";
+import API_BASE_URL from "@/config/api.config";
 
 //action
 export const fetchUserDetails = createAsyncThunk(
@@ -12,7 +13,7 @@ export const fetchUserDetails = createAsyncThunk(
       // const response = await axios.get("https://videotube-two.vercel.app/users/current-user/");
       const response = await axios({
         method: "get",
-        url: "https://videotube-two.vercel.app/users/current-user/",
+        url: `${API_BASE_URL}/users/current-user/`,
         withCredentials: true,
       });
       // toast.success("welcome," + response.data.data.userName);

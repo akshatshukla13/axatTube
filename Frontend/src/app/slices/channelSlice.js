@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 import parseAxiosError from "@/utils/errorUtil";
+import API_BASE_URL from "@/config/api.config";
 
 export const fetchChannelDetails = createAsyncThunk(
   "fetchChannelDetails",
@@ -10,14 +11,14 @@ export const fetchChannelDetails = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/users/uid/${username}`,
+        url: `${API_BASE_URL}/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelDetails ", userId.data);
       const response = await axios({
         method: "post",
-        url: `https://videotube-two.vercel.app/channel/stats/${userId.data}`,
+        url: `${API_BASE_URL}/channel/stats/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -38,14 +39,14 @@ export const fetchChannelVideos = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/users/uid/${username}`,
+        url: `${API_BASE_URL}/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId for videos", userId.data);
       console.log("doing fetchChannelVideos ", userId.data);
       const response = await axios({
         method: "post",
-        url: `https://videotube-two.vercel.app/channel/videos/${userId.data}`,
+        url: `${API_BASE_URL}/channel/videos/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -66,14 +67,14 @@ export const fetchChannelPlaylists = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/users/uid/${username}`,
+        url: `${API_BASE_URL}/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelPlaylists ", userId.data.data);
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/playlist/user/${userId.data}`,
+        url: `${API_BASE_URL}/playlist/user/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -94,14 +95,14 @@ export const fetchChannelTweets = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/users/uid/${username}`,
+        url: `${API_BASE_URL}/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchChannelTweets ", userId.data);
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/tweet/user/${userId.data}`,
+        url: `${API_BASE_URL}/tweet/user/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
@@ -122,14 +123,14 @@ export const fetchSubscribedChannels = createAsyncThunk(
       console.log("doing fetchUserId ", username);
       const userId = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/users/uid/${username}`,
+        url: `${API_BASE_URL}/users/uid/${username}`,
         withCredentials: true,
       });
       console.log("got UserId ", userId.data);
       console.log("doing fetchSubscribedChannels ", userId.data);
       const response = await axios({
         method: "get",
-        url: `https://videotube-two.vercel.app/subscribe/c/${userId.data}`,
+        url: `${API_BASE_URL}/subscribe/c/${userId.data}`,
         withCredentials: true,
       });
       console.log("channelData : ", response.data);
