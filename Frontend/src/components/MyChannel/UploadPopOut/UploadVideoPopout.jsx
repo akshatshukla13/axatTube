@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { uplaodVideo } from "@/app/slices/videoSlice";
+import { toast } from "react-toastify";
 
 
 function UploadVideoPopout() {
@@ -33,34 +34,47 @@ function UploadVideoPopout() {
     const title = document.getElementById("title").value;
     const description = document.getElementById("desc").value;
 
-    // Log the data to send to the API
-    console.log("Video File:", videoFile);
-    console.log("Thumbnail File:", thumbnailFile);
-    console.log("Title:", title);
-    console.log("Description:", description);
+    // Validation
+    if (!videoFile) {
+      toast.error("Please select a video file");
+      return;
+    }
+    if (!thumbnailFile) {
+      toast.error("Please select a thumbnail image");
+      return;
+    }
+    if (!title.trim()) {
+      toast.error("Please enter a video title");
+      return;
+    }
+    if (!description.trim()) {
+      toast.error("Please enter a video description");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("videoFile", videoFile);  // video file from frontend
-    formData.append("thumbnail", thumbnailFile);  // thumbnail file from frontend
-    formData.append("title", title);  // title from frontend
-    formData.append("description", description);  // description from frontend
+    formData.append("videoFile", videoFile);
+    formData.append("thumbnail", thumbnailFile);
+    formData.append("title", title);
+    formData.append("description", description);
 
     dispatch(uplaodVideo({formData}));
+    toast.success("Video upload started!");
   }
 
   return (
-    hidden &&
+    !hidden &&
     <>
-      <div className="abc" class="absolute inset-0 z-10 bg-black/50 px-4 pb-[86px] pt-4 sm:px-14 sm:py-8">
-        <div class="h-auto overflow-auto border bg-[#121212]">
-          <div class="flex items-center justify-between border-b p-4">
-            <h2 class="text-xl font-semibold">Upload Videos</h2>
-            <button onClick={uploadToDB} class="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]">
+      <div className="absolute inset-0 z-10 bg-black/50 px-4 pb-[86px] pt-4 sm:px-14 sm:py-8">
+        <div className="h-auto overflow-auto border bg-[#121212]">
+          <div className="flex items-center justify-between border-b p-4">
+            <h2 className="text-xl font-semibold">Upload Videos</h2>
+            <button onClick={uploadToDB} className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]">
               Save
             </button>
             <button
               onClick={changeVisibility}
-              class="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]"
+              className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]"
             >
               Cancel
             </button>

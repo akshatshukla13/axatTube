@@ -38,6 +38,9 @@ import "react-toastify/dist/ReactToastify.css";
 import AdminDashBoardPage from "./components/MyChannel/AdminPanel/AdminDashBoardPage.jsx";
 import LikeDashboard from "./components/LikeDashBoard/LikeDashboard.jsx";
 import Setting from "./components/ExtrasPage/Setting.jsx";
+import SearchPage from "./components/VideoPage/SearchPage.jsx";
+import WatchHistoryPage from "./components/VideoPage/WatchHistoryPage.jsx";
+import SettingsPage from "./components/ExtrasPage/SettingsPage.jsx";
 
 const router = createBrowserRouter([
 
@@ -152,7 +155,35 @@ const router = createBrowserRouter([
   //settings
   {
     path: "/@/:username/setting",
-    element: <Setting />,
+    element: <SettingsPage />,
+  },
+
+  //search
+  {
+    path: "/search",
+    element: (
+      <>
+        <Header />
+        <div className="flex">
+          <Aside />
+          <SearchPage />
+        </div>
+      </>
+    ),
+  },
+
+  //watch history
+  {
+    path: "/history",
+    element: (
+      <>
+        <Header />
+        <div className="flex">
+          <Aside />
+          <WatchHistoryPage />
+        </div>
+      </>
+    ),
   },
 
   //auth routes

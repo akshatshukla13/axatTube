@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RegisterUser } from "@/app/slices/authSlice";
+import { toast } from "react-toastify";
+import {
+  validateEmail,
+  validatePassword,
+  validateFullName,
+  validateUsername,
+} from "@/utils/validation";
 
 function AuthRegister() {
   const dispatch = useDispatch();
@@ -41,8 +48,29 @@ function AuthRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation
     if (!formData.email || !formData.password || !formData.fullName || !formData.userName) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!validateEmail(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!validatePassword(formData.password)) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    if (!validateFullName(formData.fullName)) {
+      toast.error("Full name must be at least 2 characters");
+      return;
+    }
+
+    if (!validateUsername(formData.userName)) {
+      toast.error("Username must be 3-20 alphanumeric characters");
       return;
     }
 
@@ -56,10 +84,11 @@ function AuthRegister() {
       ).unwrap();
 
       if (result) {
-        alert("Registration successful! Please login.");
+        toast.success("Registration successful! Redirecting to login...");
         navigate("/login");
       }
     } catch (error) {
+      toast.error(error?.message || "Registration failed. Please try again.");
       console.error("Registration failed:", error);
     }
   };

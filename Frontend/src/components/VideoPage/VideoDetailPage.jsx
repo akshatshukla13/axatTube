@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPerticularVideoDetails } from "@/app/slices/videoSlice";
 import { fetchVideoComments } from "@/app/slices/commentSlice";
 import API_BASE_URL from "@/config/api.config";
+import { toast } from "react-toastify";
 
 function VideoDetailPage() {
   const navigate = useNavigate();
@@ -38,49 +39,59 @@ function VideoDetailPage() {
   };
 
   const handleCommentForm = async () => {
-    console.log("cmdata:", commentData.data);
-    setComment("")
-    //here send comment through api
-    const formData = new FormData();
-    formData.append("content", comment);
-    if (comment.trim() != "") {
+    if (!comment.trim()) {
+      toast.error("Comment cannot be empty");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("content", comment);
       const resp = await axios({
         method: "post",
         url: `${API_BASE_URL}/comment/${videoData.data._id}`,
         data: formData,
         withCredentials: true,
       });
-      // console.log(videoData.data._id);
-      // console.log(resp.data);
+      setComment("");
       dispatch(fetchVideoComments({ id }));
+      toast.success("Comment added successfully");
+    } catch (error) {
+      toast.error("Failed to add comment");
+      console.error(error);
     }
   };
 
   const likeHandler = async (e) => {
     e.preventDefault()
     if (like != null) return
-    setLike(videoData.data.noOfLikes + 1);
-    const resp = await axios({
-      method: "post",
-      url: `${API_BASE_URL}/like/toggle/v/${videoData.data._id}`,
-      withCredentials: true,
-    });
+    try {
+      const resp = await axios({
+        method: "post",
+        url: `${API_BASE_URL}/like/toggle/v/${videoData.data._id}`,
+        withCredentials: true,
+      });
+      setLike(videoData.data.noOfLikes + 1);
+      toast.success("Liked!");
+    } catch (error) {
+      toast.error("Failed to like video");
+      console.error(error);
+    }
   }
 
   return (
     videoData && (
       <>
-        <div class="h-screen overflow-y-auto bg-[#121212] text-white">
-          <div class="flex min-h-[calc(100vh-66px)] sm:min-h-[calc(100vh-82px)]">
-            <section class="w-full pb-[70px] sm:ml-[70px] sm:pb-0">
-              <div class="flex w-full flex-wrap gap-4 p-4 lg:flex-nowrap">
+        <div className="h-screen overflow-y-auto bg-[#121212] text-white">
+          <div className="flex min-h-[calc(100vh-66px)] sm:min-h-[calc(100vh-82px)]">
+            <section className="w-full pb-[70px] sm:ml-[70px] sm:pb-0">
+              <div className="flex w-full flex-wrap gap-4 p-4 lg:flex-nowrap">
                 {/* main section starts */}
                 {videoData.data && (
-                  <div class="col-span-12 w-full">
+                  <div className="col-span-12 w-full">
                     {/* video starts */}
-                    <div class="relative mb-4 w-full pt-[56%]">
-                      <div class="absolute inset-0">
-                        <video class="h-full w-full" controls autoPlay muted>
+                    <div className="relative mb-4 w-full pt-[56%]">
+                      <div className="absolute inset-0">
+                        <video className="h-full w-full" controls autoPlay muted>
                           <source
                             src={videoData.data.videoFile}
                             type="video/mp4"
@@ -92,32 +103,32 @@ function VideoDetailPage() {
 
                     {/* below video box starts */}
                     <div
-                      class="group mb-4 w-full rounded-lg border p-4 duration-200 hover:bg-white/5 focus:bg-white/5"
+                      className="group mb-4 w-full rounded-lg border p-4 duration-200 hover:bg-white/5 focus:bg-white/5"
                       role="button"
-                      tabindex="0"
+                      tabIndex="0"
                     >
                       {/* save to playlist start */}
-                      <div class="flex flex-wrap gap-y-2">
-                        <div class="w-full md:w-1/2 lg:w-full xl:w-1/2">
-                          <h1 class="text-lg font-bold">
+                      <div className="flex flex-wrap gap-y-2">
+                        <div className="w-full md:w-1/2 lg:w-full xl:w-1/2">
+                          <h1 className="text-lg font-bold">
                             {videoData.data.title}
                           </h1>
-                          <p class="flex text-sm text-gray-200">
+                          <p className="flex text-sm text-gray-200">
                             {videoData.data.views} Views ·
                             {videoData.data.createdAt}
                           </p>
                         </div>
-                        <div class="w-full md:w-1/2 lg:w-full xl:w-1/2">
-                          <div class="flex items-center justify-between gap-x-4 md:justify-end lg:justify-between xl:justify-end">
-                            <div class="flex overflow-hidden rounded-lg border">
+                        <div className="w-full md:w-1/2 lg:w-full xl:w-1/2">
+                          <div className="flex items-center justify-between gap-x-4 md:justify-end lg:justify-between xl:justify-end">
+                            <div className="flex overflow-hidden rounded-lg border">
                               <button
                                 onClick={likeHandler}
-                                class="group/btn flex items-center gap-x-2 border-r border-gray-700 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
+                                className="group/btn flex items-center gap-x-2 border-r border-gray-700 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
                               // data-like={videoData.data.noOfLikes}
                               // data-like-alt={videoData.data.noOfLikes+1}
                               >
                                 {/* <h1>45</h1> */}
-                                <span class="inline-block w-5 group-focus/btn:text-[#ae7aff]">
+                                <span className="inline-block w-5 group-focus/btn:text-[#ae7aff]">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -138,10 +149,10 @@ function VideoDetailPage() {
                                 <h2>{like || videoData.data.noOfLikes}</h2> {/* like count */}
                               </button>
                               <button
-                                class="group/btn flex items-center gap-x-2 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
+                                className="group/btn flex items-center gap-x-2 px-4 py-1.5 after:content-[attr(data-like)] hover:bg-white/10 focus:after:content-[attr(data-like-alt)]"
 
                               >
-                                <span class="inline-block w-5 group-focus/btn:text-[#ae7aff]">
+                                <span className="inline-block w-5 group-focus/btn:text-[#ae7aff]">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -159,7 +170,7 @@ function VideoDetailPage() {
                                 </span>
                               </button>
                             </div>
-                            <div class="relative block">
+                            <div className="relative block">
                               <button class="peer flex items-center gap-x-2 rounded-lg bg-white px-4 py-1.5 text-black">
                                 <span class="inline-block w-5">
                                   <svg

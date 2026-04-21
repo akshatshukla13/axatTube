@@ -15,26 +15,30 @@ function AuthLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email) {
-      if (!password) {
-        toast.error("Enter email and passs");
-      }
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
     }
     dispatch(LogedInUser({ email, password }));
   };
 
   useEffect(() => {
-    console.log("called...");
     if (data) {
       navigate('/')
     }
   }, [data])
 
+  useEffect(() => {
+    if (isError) {
+      toast.error("Login failed. Please check your credentials.");
+    }
+  }, [isError])
+
 
   return (
-    <div class="h-screen overflow-y-auto bg-[#121212] text-white">
-      <div class="mx-auto my-8 flex w-full max-w-sm flex-col px-4">
-        <div class="mx-auto inline-block w-16">
+    <div className="h-screen overflow-y-auto bg-[#121212] text-white">
+      <div className="mx-auto my-8 flex w-full max-w-sm flex-col px-4">
+        <div className="mx-auto inline-block w-16">
           <svg
             // style={{ width: "100%" }}
             style={{ width: "100%" }}
@@ -90,7 +94,7 @@ function AuthLogin() {
             </defs>
           </svg>
         </div>
-        <div class="mb-6 w-full text-center text-2xl font-semibold uppercase">
+        <div className="mb-6 w-full text-center text-2xl font-semibold uppercase">
           Play
         </div>
 
@@ -102,7 +106,7 @@ function AuthLogin() {
           id="email"
           type="email"
           placeholder="Enter your email"
-          class="mb-4 rounded-lg border bg-transparent px-3 py-2"
+          className="mb-4 rounded-lg border bg-transparent px-3 py-2"
         />
         <input
           value={password}
@@ -112,13 +116,14 @@ function AuthLogin() {
           id="password"
           type="password"
           placeholder="Enter your password"
-          class="mb-4 rounded-lg border bg-transparent px-3 py-2"
+          className="mb-4 rounded-lg border bg-transparent px-3 py-2"
         />
         <button
           onClick={handleSubmit}
-          class="bg-[#ae7aff] px-4 py-3 text-black"
+          disabled={isLoading}
+          className="bg-[#ae7aff] px-4 py-3 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign in with Email
+          {isLoading ? "Signing in..." : "Sign in with Email"}
         </button>
       </div>
     </div>
