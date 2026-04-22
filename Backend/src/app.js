@@ -33,6 +33,9 @@ import playlistRoute from "./routes/playlist.routes.js";
 import likeRoute from "./routes/like.routes.js";
 import channelRoute from "./routes/dashboard.routes.js";
 import subscribeRoute from "./routes/subscription.routes.js"
+import { apiRateLimiter } from "./middlewares/rateLimit.middleware.js";
+
+app.use(apiRateLimiter);
 
 app.use("/users", userRouter);
 

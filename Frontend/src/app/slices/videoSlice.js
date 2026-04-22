@@ -62,6 +62,16 @@ export const uplaodVideo = createAsyncThunk("uplaodVideo", async ({ formData }) 
         "Content-Type": "multipart/form-data",
       },
       withCredentials: true,
+      onUploadProgress: ({ loaded, total }) => {
+        if (!total) {
+          return;
+        }
+        window.dispatchEvent(
+          new CustomEvent("video-upload-progress", {
+            detail: Math.round((loaded / total) * 100),
+          }),
+        );
+      },
     });
     console.log("uploaded video");
     console.log(response.data);
@@ -80,6 +90,7 @@ const initialState = {
   isError: false,
   perticularVideoData: null,
   uploadedVideo: false,
+  uploadProgress: 0,
 };
 
 export const videoSlice = createSlice({
@@ -115,16 +126,19 @@ export const videoSlice = createSlice({
     builder.addCase(uplaodVideo.pending, (state, action) => {
       state.isLoading = true;
       state.uploadedVideo = false;
+      state.uploadProgress = 0;
     });
     builder.addCase(uplaodVideo.fulfilled, (state, action) => {
       state.isLoading = false;
       state.uploadedVideo = action.payload?.data || true;
+      state.uploadProgress = 100;
     });
     builder.addCase(uplaodVideo.rejected, (state, action) => {
       console.log("Error", action.payload);
       state.isError = true;
       state.isLoading = false;
       state.uploadedVideo = false;
+      state.uploadProgress = 0;
     });
   },
   reducers: {
@@ -133,10 +147,15 @@ export const videoSlice = createSlice({
     },
     resetUploadedVideo: (state, action) => {
       state.uploadedVideo = false;
+      state.uploadProgress = 0;
+    },
+    setUploadProgress: (state, action) => {
+      state.uploadProgress = action.payload;
     },
   },
 });
 
-export const { resetPerticularVideo,resetUploadedVideo } = videoSlice.actions;
+export const { resetPerticularVideo, resetUploadedVideo, setUploadProgress } =
+  videoSlice.actions;
 
 export default videoSlice.reducer;

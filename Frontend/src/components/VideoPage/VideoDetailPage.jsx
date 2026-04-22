@@ -16,6 +16,15 @@ function VideoDetailPage() {
   const [sideVideoData, setSideVideoData] = useState(null);
   const [comment, setComment] = useState("");
   const [like, setLike] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const formatDate = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString();
+  };
 
   useEffect(() => {
     dispatch(fetchPerticularVideoDetails({ id }));
@@ -76,10 +85,10 @@ function VideoDetailPage() {
   };
 
   const likeHandler = async (e) => {
-    e.preventDefault()
-    if (like != null) return
+    e.preventDefault();
+    if (like !== null) return;
     try {
-      const resp = await axios({
+      await axios({
         method: "post",
         url: `${API_BASE_URL}/like/toggle/v/${videoData.data._id}`,
         withCredentials: true,
@@ -90,7 +99,19 @@ function VideoDetailPage() {
       toast.error("Failed to like video");
       console.error(error);
     }
-  }
+  };
+
+  const shareVideo = async () => {
+    const shareUrl = `${window.location.origin}/video/${id}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+      toast.success("Video link copied");
+    } catch (error) {
+      toast.error("Could not copy video link");
+    }
+  };
 
   return (
     videoData && (
@@ -129,7 +150,7 @@ function VideoDetailPage() {
                           </h1>
                           <p className="flex text-sm text-gray-200">
                             {videoData.data.views} Views ·
-                            {videoData.data.createdAt}
+                            {formatDate(videoData.data.createdAt)}
                           </p>
                         </div>
                         <div className="w-full md:w-1/2 lg:w-full xl:w-1/2">
@@ -185,6 +206,12 @@ function VideoDetailPage() {
                               </button>
                             </div>
                             <div className="relative block">
+                              <button
+                                onClick={shareVideo}
+                                className="mr-2 rounded-lg border px-3 py-1.5 text-sm"
+                              >
+                                {copied ? "Copied" : "Share"}
+                              </button>
                               <button class="peer flex items-center gap-x-2 rounded-lg bg-white px-4 py-1.5 text-black">
                                 <span class="inline-block w-5">
                                   <svg
@@ -458,9 +485,17 @@ function VideoDetailPage() {
                       <hr class="my-4 border-white" />
 
                       {/* discription starts */}
-                      <div class="h-5 overflow-hidden group-focus:h-auto">
+                      <div
+                        className={`text-sm ${showFullDescription ? "h-auto" : "h-5 overflow-hidden"}`}
+                      >
                         <p class="text-sm">{videoData.data.discription}</p>
                       </div>
+                      <button
+                        className="mt-2 text-sm text-[#ae7aff]"
+                        onClick={() => setShowFullDescription((prev) => !prev)}
+                      >
+                        {showFullDescription ? "Show less" : "Show more"}
+                      </button>
                       {/* discription ends */}
                     </div>
                     {/* below video box ends */}
@@ -504,7 +539,7 @@ function VideoDetailPage() {
                               <div class="block">
                                 <p class="flex items-center text-gray-200">
                                   {data.owner.fullName}·
-                                  <span class="text-sm">{"{" + data.createdAt + "}"}</span>
+                                  <span class="text-sm">{formatDate(data.createdAt)}</span>
                                 </p>
                                 <p class="text-sm text-gray-200">
                                   {"@" + data.owner.userName}
@@ -552,14 +587,15 @@ function VideoDetailPage() {
                 {/* side section starts*/}
                 <div class="col-span-12 flex w-full shrink-0 flex-col gap-3 lg:w-[350px] xl:w-[400px]">
                   {sideVideoData &&
-                    sideVideoData.map((e) => (
+                    sideVideoData
+                      .filter((e) => String(e._id) !== String(id))
+                      .slice(0, 8)
+                      .map((e) => (
                       <>
                         {/* single side video */}
                         <div
                           onClick={() => {
-                            id = e._id;
-                            navigate("/video/" + id);
-                            location.reload();
+                            navigate("/video/" + e._id);
                           }}
                           class="w-full gap-x-2 border pr-2 md:flex"
                         >
@@ -593,7 +629,7 @@ function VideoDetailPage() {
                                 {e.owner.userName}
                               </p>
                               <p class="flex text-sm text-gray-200">
-                                {e.views} Views · {e.createdAt}
+                                {e.views} Views · {formatDate(e.createdAt)}
                               </p>
                             </div>
                           </div>

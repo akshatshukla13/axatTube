@@ -42,6 +42,7 @@ import SearchPage from "./components/VideoPage/SearchPage.jsx";
 import WatchHistoryPage from "./components/VideoPage/WatchHistoryPage.jsx";
 import SettingsPage from "./components/ExtrasPage/SettingsPage.jsx";
 import SubscribedVideosPage from "./components/VideoPage/SubscribedVideosPage.jsx";
+import About from "./components/ExtrasPage/About.jsx";
 
 const router = createBrowserRouter([
 
@@ -196,6 +197,20 @@ const router = createBrowserRouter([
         <div className="flex">
           <Aside />
           <SubscribedVideosPage />
+        </div>
+      </>
+    ),
+  },
+
+  //about app
+  {
+    path: "/about",
+    element: (
+      <>
+        <Header />
+        <div className="flex">
+          <Aside />
+          <About />
         </div>
       </>
     ),

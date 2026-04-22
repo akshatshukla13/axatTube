@@ -9,6 +9,7 @@ import {
 } from "../controllers/video.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { writeRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 // router.use(); // Apply verifyJWT middleware to all routes in this file
@@ -17,6 +18,7 @@ router
   .route("/")
   .get(getAllVideos)
   .post(
+    writeRateLimiter,
     verifyJWT,
     upload.fields([
       {
@@ -34,9 +36,11 @@ router
 router
   .route("/:videoId")
   .get( getVideoById)
-  .delete(verifyJWT, deleteVideo)
-  .patch(verifyJWT, upload.single("thumbnail"), updateVideo);
+  .delete(writeRateLimiter, verifyJWT, deleteVideo)
+  .patch(writeRateLimiter, verifyJWT, upload.single("thumbnail"), updateVideo);
 
-router.route("/toggle/publish/:videoId").patch(verifyJWT, togglePublishStatus);
+router
+  .route("/toggle/publish/:videoId")
+  .patch(writeRateLimiter, verifyJWT, togglePublishStatus);
 
 export default router;
