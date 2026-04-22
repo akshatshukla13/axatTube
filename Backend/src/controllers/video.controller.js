@@ -1,4 +1,4 @@
-import mongoose, { isValidObjectId } from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { Video } from "../Models/video.model.js";
 import { User } from "../Models/user.model.js";
 import { ApiError } from "../utils/APIerror.js";
@@ -9,7 +9,9 @@ import { Like } from "../Models/like.model.js";
 
 const getAllVideos = AsyncHandler(async (req, res) => {
   try {
-    const allVideos = await Video.find({}).populate(
+    const allVideos = await Video.find({ isPublished: true })
+      .sort({ createdAt: -1 })
+      .populate(
       "owner",
       "userName email fullName avatar"
     );
@@ -70,8 +72,8 @@ const publishAVideo = AsyncHandler(async (req, res) => {
   }
 
   const wholeVideo = await Video.create({
-    videoFile: video.url,
-    thumbnail: thumbnail.url,
+    videoFile: video.secure_url || video.url,
+    thumbnail: thumbnail.secure_url || thumbnail.url,
     title,
     discription: description,
     duration: video.duration,
@@ -94,7 +96,7 @@ const publishAVideo = AsyncHandler(async (req, res) => {
 const getVideoById = AsyncHandler(async (req, res) => {
   const { videoId } = req.params;
   //TODO: get video by id
-  if (!videoId) {
+  if (!videoId || !isValidObjectId(videoId)) {
     throw new ApiError(402, "VideoId required");
   }
 
@@ -103,17 +105,15 @@ const getVideoById = AsyncHandler(async (req, res) => {
     select: "userName email fullName avatar",
   });
 
-  const noOfLikes = await Like.countDocuments({ video: video._id });
-  console.log(noOfLikes);
-  
-  const videoObject = video.toObject();
-  videoObject.noOfLikes = noOfLikes;
-
-  console.log(videoObject);
-  
   if (!video) {
     throw new ApiError(401, "Invalid Video Id");
   }
+
+  await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+  const noOfLikes = await Like.countDocuments({ video: video._id });
+  const videoObject = video.toObject();
+  videoObject.views = (videoObject.views || 0) + 1;
+  videoObject.noOfLikes = noOfLikes;
 
   return res
     .status(201)

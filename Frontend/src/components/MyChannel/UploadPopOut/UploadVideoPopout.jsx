@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { uplaodVideo } from "@/app/slices/videoSlice";
 import { toast } from "react-toastify";
 
@@ -10,6 +10,7 @@ function UploadVideoPopout({ isOpen, onClose, onUploadStart }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const dispatch = useDispatch();
+  const isUploading = useSelector((state) => state.video.isLoading);
 
   useEffect(() => {
     return () => {
@@ -91,11 +92,16 @@ function UploadVideoPopout({ isOpen, onClose, onUploadStart }) {
         <div className="h-auto overflow-auto border bg-[#121212]">
           <div className="flex items-center justify-between border-b p-4">
             <h2 className="text-xl font-semibold">Upload Videos</h2>
-            <button onClick={uploadToDB} className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]">
-              Save
+            <button
+              onClick={uploadToDB}
+              disabled={isUploading}
+              className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out disabled:cursor-not-allowed disabled:opacity-70 active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]"
+            >
+              {isUploading ? "Uploading..." : "Save"}
             </button>
             <button
               onClick={onClose}
+              disabled={isUploading}
               className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]"
             >
               Cancel
@@ -162,6 +168,7 @@ function UploadVideoPopout({ isOpen, onClose, onUploadStart }) {
               <input
                 id="thumbnail"
                 type="file"
+                accept="image/*"
                 onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
                 className="w-full border p-1 file:mr-4 file:border-none file:bg-[#ae7aff] file:px-3 file:py-1.5"
               />

@@ -4,7 +4,7 @@ import UploadVideoPopout from "./UploadPopOut/UploadVideoPopout.jsx";
 import UploadingVideoPopout from "./UploadPopOut/UploadingVideoPopout.jsx";
 import UploadedSuccess from "./UploadPopOut/UploadedSuccess.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { resetUploadedVideo } from "@/app/slices/videoSlice.js";
+import { resetUploadedVideo, setUploadProgress } from "@/app/slices/videoSlice.js";
 import { fetchMyChannelDetails, fetchMyChannelPlaylists, fetchMyChannelTweets, fetchMyChannelVideos, fetchMySubscribedChannels } from "@/app/slices/myChannelSlice";
 
 function MyChannel({ Compo }) {
@@ -14,6 +14,7 @@ function MyChannel({ Compo }) {
   const [uploadMeta, setUploadMeta] = useState(null);
   const uploading = useSelector((state) => state.video.isLoading);
   const uploaded = useSelector((state) => state.video.uploadedVideo);
+  const uploadProgress = useSelector((state) => state.video.uploadProgress);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,6 +42,17 @@ function MyChannel({ Compo }) {
       dispatch(fetchMyChannelDetails({ username }));
     }
   }, [dispatch, uploaded, username]);
+
+  useEffect(() => {
+    const progressHandler = (event) => {
+      dispatch(setUploadProgress(event.detail || 0));
+    };
+
+    window.addEventListener("video-upload-progress", progressHandler);
+    return () => {
+      window.removeEventListener("video-upload-progress", progressHandler);
+    };
+  }, [dispatch]);
 
   const openUploadPanel = () => {
     dispatch(resetUploadedVideo());
@@ -212,6 +224,7 @@ function MyChannel({ Compo }) {
         {showUploadingOverlay && (
           <UploadingVideoPopout
             uploadMeta={uploadMeta}
+            uploadProgress={uploadProgress}
             onClose={() => setShowUploadingOverlay(false)}
           />
         )}
