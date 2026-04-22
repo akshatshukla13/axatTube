@@ -144,6 +144,34 @@ export const fetchSubscribedChannels = createAsyncThunk(
   }
 );
 
+export const fetchChannelSubscribers = createAsyncThunk(
+  "fetchChannelSubscribers",
+  async ({ username }) => {
+    try {
+      console.log("doing fetchUserId for subscribers ", username);
+      const userId = await axios({
+        method: "get",
+        url: `${API_BASE_URL}/users/uid/${username}`,
+        withCredentials: true,
+      });
+      console.log("got UserId for subscribers ", userId.data);
+      console.log("doing fetchChannelSubscribers ", userId.data);
+      const response = await axios({
+        method: "get",
+        url: `${API_BASE_URL}/subscribe/u/${userId.data}`,
+        withCredentials: true,
+      });
+      console.log("subscribers data : ", response.data);
+      return response.data;
+    } catch (error) {
+      console.log("Err ", error);
+      const err = parseAxiosError(error.response.data);
+      console.log(error);
+      throw error;
+    }
+  }
+);
+
 const initialState = {
   isLoading: false,
   channelData: null,
@@ -151,6 +179,7 @@ const initialState = {
   channelPlaylistData: null,
   channelTweetData: null,
   channelSubscribedData: null,
+  channelSubscribersData: null,
   isError: false,
 };
 
@@ -218,6 +247,19 @@ export const channelSlice = createSlice({
       state.channelSubscribedData = action.payload.data;
     });
     builder.addCase(fetchSubscribedChannels.rejected, (state, action) => {
+      console.log("Error");
+      state.isError = true;
+      state.isLoading = false;
+    });
+
+    builder.addCase(fetchChannelSubscribers.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchChannelSubscribers.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.channelSubscribersData = action.payload.data;
+    });
+    builder.addCase(fetchChannelSubscribers.rejected, (state, action) => {
       console.log("Error");
       state.isError = true;
       state.isLoading = false;

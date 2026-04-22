@@ -3,24 +3,71 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchChannelDetails, fetchChannelPlaylists, fetchChannelTweets, fetchChannelVideos, fetchSubscribedChannels } from "@/app/slices/channelSlice";
+import axios from "axios";
+import { toast } from "react-toastify";
+import API_BASE_URL from "@/config/api.config";
+import { fetchChannelDetails, fetchChannelPlaylists, fetchChannelTweets, fetchChannelVideos, fetchChannelSubscribers } from "@/app/slices/channelSlice";
 
 function Channel({ Compo }) {
   const { username } = useParams()
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const channelDetails = useSelector((state) => state.channel.channelData);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
 
   useEffect(() => {
     dispatch(fetchChannelDetails({ username }))
     dispatch(fetchChannelVideos({ username }))
     dispatch(fetchChannelTweets({ username }))
     dispatch(fetchChannelPlaylists({ username }))
-    dispatch(fetchSubscribedChannels({ username }))
+    dispatch(fetchChannelSubscribers({ username }))
   }, [dispatch, username])
 
+  // Check subscription status when channel details load
+  useEffect(() => {
+    if (channelDetails?.ChannelDetails?._id) {
+      checkSubscriptionStatus(channelDetails.ChannelDetails._id);
+    }
+  }, [channelDetails?.ChannelDetails?._id]);
 
-  const channelDetails = useSelector((state) => state.channel.channelData);
+  const checkSubscriptionStatus = async (channelId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/subscribe/u/${channelId}`,
+        { withCredentials: true }
+      );
+      // If we get a successful response, the user is subscribed
+      if (response.data?.data && Array.isArray(response.data.data)) {
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      setIsSubscribed(false);
+    }
+  };
+
+  const toggleSubscription = async () => {
+    if (!channelDetails?.ChannelDetails?._id) {
+      toast.error("Channel information not available");
+      return;
+    }
+
+    setIsLoadingSubscription(true);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/subscribe/u/${channelDetails.ChannelDetails._id}`,
+        {},
+        { withCredentials: true }
+      );
+      setIsSubscribed(!isSubscribed);
+      toast.success(response?.data?.message || (isSubscribed ? "Unsubscribed successfully" : "Subscribed successfully"));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update subscription");
+      console.error(error);
+    } finally {
+      setIsLoadingSubscription(false);
+    }
+  };
 
   return (
     channelDetails &&
@@ -52,7 +99,11 @@ function Channel({ Compo }) {
             </div>
             <div class="inline-block">
               <div class="inline-flex min-w-[145px] justify-end">
-                <button class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto">
+                <button 
+                  onClick={toggleSubscription}
+                  disabled={isLoadingSubscription}
+                  class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto disabled:opacity-50"
+                >
                   <span class="inline-block w-5">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -69,8 +120,9 @@ function Channel({ Compo }) {
                       ></path>
                     </svg>
                   </span>
-                  <span class="group-focus/btn:hidden">Subscribe</span>
-                  <span class="hidden group-focus/btn:block">Subscribed</span>
+                  <span>
+                    {isSubscribed ? "Subscribed" : "Subscribe"}
+                  </span>
                 </button>
               </div>
             </div>

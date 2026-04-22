@@ -16,11 +16,20 @@ function VideoDetailPage() {
   const [sideVideoData, setSideVideoData] = useState(null);
   const [comment, setComment] = useState("");
   const [like, setLike] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
 
   useEffect(() => {
     dispatch(fetchPerticularVideoDetails({ id }));
     dispatch(fetchVideoComments({ id }));
   }, [dispatch, id]);
+
+  // Check subscription status when video data loads
+  useEffect(() => {
+    if (videoData?.data?.owner?._id) {
+      checkSubscriptionStatus();
+    }
+  }, [videoData?.data?.owner?._id]);
 
   useEffect(() => {
     (async () => {
@@ -47,6 +56,22 @@ function VideoDetailPage() {
       }
     })();
   }, []);
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/subscribe/u/${videoData.data.owner._id}`,
+        { withCredentials: true }
+      );
+      // If we get a successful response, the user is subscribed to this channel
+      // Check if current user is in the subscribers list
+      if (response.data?.data && Array.isArray(response.data.data)) {
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      setIsSubscribed(false);
+    }
+  };
 
   const handleInputChange = (event) => {
     setComment(event.target.value);
@@ -91,6 +116,30 @@ function VideoDetailPage() {
       console.error(error);
     }
   }
+
+  const toggleSubscription = async () => {
+    if (!videoData?.data?.owner?._id) {
+      toast.error("Channel information not available");
+      return;
+    }
+
+    setIsLoadingSubscription(true);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/subscribe/u/${videoData.data.owner._id}`,
+        {},
+        { withCredentials: true }
+      );
+      // Toggle the subscription state
+      setIsSubscribed(!isSubscribed);
+      toast.success(response?.data?.message || (isSubscribed ? "Unsubscribed successfully" : "Subscribed successfully"));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update subscription");
+      console.error(error);
+    } finally {
+      setIsLoadingSubscription(false);
+    }
+  };
 
   return (
     videoData && (
@@ -427,7 +476,11 @@ function VideoDetailPage() {
                           </div>
                         </div>
                         <div class="block">
-                          <button class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto">
+                          <button 
+                            onClick={toggleSubscription}
+                            disabled={isLoadingSubscription}
+                            class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto disabled:opacity-50"
+                          >
                             <span class="inline-block w-5">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -444,11 +497,8 @@ function VideoDetailPage() {
                                 ></path>
                               </svg>
                             </span>
-                            <span class="group-focus/btn:hidden">
-                              Subscribe
-                            </span>
-                            <span class="hidden group-focus/btn:block">
-                              Subscribed
+                            <span>
+                              {isSubscribed ? "Subscribed" : "Subscribe"}
                             </span>
                           </button>
                         </div>
