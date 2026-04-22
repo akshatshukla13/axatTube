@@ -149,19 +149,19 @@ const updateVideo = AsyncHandler(async (req, res) => {
 
   const thumbnailLocalPath = req.file?.path;
 
-  if (!thumbnailLocalPath) {
-    throw new ApiError(401, "No thumbnail found");
+  if (thumbnailLocalPath) {
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+
+    if (!thumbnail) {
+      throw new ApiError(401, "No thumbnail url found");
+    }
+
+    video.thumbnail = thumbnail.url;
   }
 
-  const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-
-  if (!thumbnail) {
-    throw new ApiError(401, "No thumbnail url found");
+  if (!title && !description && !thumbnailLocalPath) {
+    throw new ApiError(400, "No update data provided");
   }
-
-  // console.log("thumbnail ",thumbnail.url);
-
-  video.thumbnail = thumbnail.url;
 
   const updatedVideo = await video.save({ validateBeforeSave: false });
 

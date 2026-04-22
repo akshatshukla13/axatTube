@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { resetUploadedVideo } from "@/app/slices/videoSlice";
 import { useDispatch, useSelector } from 'react-redux';
 
 
-function UploadedSuccess() {
+function UploadedSuccess({ uploadMeta, onClose }) {
 
   const uploaded = useSelector((state) => state.video.uploadedVideo);
-  const [visible, setVisible] = useState(true);
   const dispatch = useDispatch()
 
   const changeVisibility = () => {
     dispatch(resetUploadedVideo())
+    onClose?.();
   }
 
   return (
@@ -23,7 +23,7 @@ function UploadedSuccess() {
               Uploaded Video
               <span class="block text-sm text-gray-300">Track your video uploading process.</span>
             </h2>
-            <button class="h-6 w-6">
+            <button class="h-6 w-6" onClick={changeVisibility}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -56,8 +56,12 @@ function UploadedSuccess() {
               </span>
             </div>
             <div class="flex flex-col">
-              <h6>Dashboard prototype recording.mp4</h6>
-              <p class="text-sm">16 MB</p>
+              <h6>{uploadMeta?.fileName || uploadMeta?.title || "Uploaded video"}</h6>
+              <p class="text-sm">
+                {typeof uploadMeta?.fileSize === "number"
+                  ? `${(uploadMeta.fileSize / (1024 * 1024)).toFixed(2)} MB`
+                  : "Upload complete"}
+              </p>
               <div class="mt-2 flex items-center">
                 <span class="mr-2 inline-block w-6 text-[#ae7aff]">
                   <svg
@@ -76,8 +80,8 @@ function UploadedSuccess() {
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
-            <button onClick={changeVisibility} class="border px-4 py-3">Cancel</button>
-            <button class="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]">Finish</button>
+            <button onClick={changeVisibility} class="border px-4 py-3">Close</button>
+            <button onClick={changeVisibility} class="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]">Finish</button>
           </div>
         </div>
       </div>

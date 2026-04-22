@@ -1,8 +1,38 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import API_BASE_URL from "@/config/api.config";
+import { toast } from "react-toastify";
 
 function ChannelSubscribedPage() {
   const subscribedChannels = useSelector((state) => state.channel.channelSubscribedData)
+  const [searchText, setSearchText] = useState("");
+
+  const filteredChannels = useMemo(() => {
+    if (!subscribedChannels) return [];
+    return subscribedChannels.filter((subs) => {
+      const fullName = subs.fullName || "";
+      const userName = subs.userName || subs.username || "";
+      const text = searchText.toLowerCase();
+      return (
+        fullName.toLowerCase().includes(text) ||
+        userName.toLowerCase().includes(text)
+      );
+    });
+  }, [searchText, subscribedChannels]);
+
+  const handleToggleSubscribe = async (channelId) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/subscribe/u/${channelId}`,
+        {},
+        { withCredentials: true },
+      );
+      toast.success(response?.data?.message || "Subscription updated");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update subscription");
+    }
+  };
 
   return (
     <>
@@ -27,37 +57,43 @@ function ChannelSubscribedPage() {
             </svg>
           </span>
           <input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             class="w-full bg-transparent outline-none"
             placeholder="Search"
           />
         </div>
 
-        {subscribedChannels ? (
-          subscribedChannels.map((subs) => (
-            <div class="border border-red-500 flex w-full justify-between">
+        {filteredChannels.length > 0 ? (
+          filteredChannels.map((subs) => (
+            <div key={subs._id} class="flex w-full justify-between rounded border border-gray-700 p-2">
               <div class="flex items-center gap-x-2">
                 <div class="h-14 w-14 shrink-0">
                   <img
                     src={subs.avatar}
-                    alt="Code Master"
+                    alt={subs.fullName || "subscriber"}
                     class="h-full w-full rounded-full"
                   />
                 </div>
                 <div class="block">
                   <h6 class="font-semibold">{subs.fullName}</h6>
-                  <p class="text-sm text-gray-300">{subs.subcriberCount} Subscribers</p>
+                  <p class="text-sm text-gray-300">{subs.subcriberCount || 0} Subscribers</p>
                 </div>
               </div>
               <div class="block">
-                <button class="group/btn px-3 py-2 text-black bg-[#ae7aff] focus:bg-white">
-                  <span class="group-focus/btn:hidden">Subscribed</span>
-                  <span class="hidden group-focus/btn:inline">
-                    Subscribe
-                  </span>
+                <button
+                  onClick={() => handleToggleSubscribe(subs._id)}
+                  class="group/btn px-3 py-2 text-black bg-[#ae7aff]"
+                >
+                  {subs.isSubscribed ? "Unsubscribe" : "Subscribe"}
                 </button>
               </div>
             </div>))
-        ) : (<></>)}
+        ) : (
+          <p className="py-6 text-sm text-gray-400">
+            {searchText ? "No matching channels found." : "No subscribed channels found."}
+          </p>
+        )}
 
 
       </div>

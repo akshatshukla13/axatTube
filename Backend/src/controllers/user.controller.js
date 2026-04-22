@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/APIresponse.js';
 import { AsyncHandler } from '../utils/AsyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import jwt from 'jsonwebtoken';
+import mongoose, { isValidObjectId } from 'mongoose';
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -466,6 +467,63 @@ const getWatchHistory = AsyncHandler(async (req, res) => {
     );
 });
 
+const addToWatchHistory = AsyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId || !isValidObjectId(videoId)) {
+    throw new ApiError(400, 'Enter valid videoId');
+  }
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: {
+      watchHistory: new mongoose.Types.ObjectId(videoId),
+    },
+  });
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $push: {
+      watchHistory: {
+        $each: [new mongoose.Types.ObjectId(videoId)],
+        $slice: -100,
+      },
+    },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, 'Video added to watch history'));
+});
+
+const removeFromWatchHistory = AsyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId || !isValidObjectId(videoId)) {
+    throw new ApiError(400, 'Enter valid videoId');
+  }
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: {
+      watchHistory: new mongoose.Types.ObjectId(videoId),
+    },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, 'Video removed from watch history'));
+});
+
+const clearWatchHistory = AsyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(req.user._id, {
+    $set: {
+      watchHistory: [],
+    },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, 'Watch history cleared successfully'));
+});
+
 const getUserIdByUserName = AsyncHandler(async (req, res) => {
   const { userName } = req.params;
   console.log(userName);
@@ -492,5 +550,8 @@ export {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  addToWatchHistory,
+  removeFromWatchHistory,
+  clearWatchHistory,
   getUserIdByUserName,
 };

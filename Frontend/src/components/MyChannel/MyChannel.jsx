@@ -4,37 +4,59 @@ import UploadVideoPopout from "./UploadPopOut/UploadVideoPopout.jsx";
 import UploadingVideoPopout from "./UploadPopOut/UploadingVideoPopout.jsx";
 import UploadedSuccess from "./UploadPopOut/UploadedSuccess.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { videoSlice } from "@/app/slices/videoSlice.js";
+import { resetUploadedVideo } from "@/app/slices/videoSlice.js";
 import { fetchMyChannelDetails, fetchMyChannelPlaylists, fetchMyChannelTweets, fetchMyChannelVideos, fetchMySubscribedChannels } from "@/app/slices/myChannelSlice";
 
 function MyChannel({ Compo }) {
   const { username } = useParams();
-  const [uploadPannelVisibility, setUploadPannelVisibility] = useState(false);
+  const [isUploadPanelOpen, setIsUploadPanelOpen] = useState(false);
+  const [showUploadingOverlay, setShowUploadingOverlay] = useState(false);
+  const [uploadMeta, setUploadMeta] = useState(null);
   const uploading = useSelector((state) => state.video.isLoading);
+  const uploaded = useSelector((state) => state.video.uploadedVideo);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("Username: ", username);
     dispatch(fetchMyChannelDetails({ username }))
     dispatch(fetchMyChannelVideos({ username }))
     dispatch(fetchMyChannelTweets({ username }))
     dispatch(fetchMyChannelPlaylists({ username }))
     dispatch(fetchMySubscribedChannels({ username }))
-  }, [])
+  }, [dispatch, username])
 
   const channelDetails = useSelector((state) => state.myChannel.myChannelData);
-  
-
-
 
   useEffect(() => {
-    if (uploading == true) {
-      setUploadPannelVisibility((e) => !e);
+    if (uploading) {
+      setIsUploadPanelOpen(false);
+      setShowUploadingOverlay(true);
+    } else {
+      setShowUploadingOverlay(false);
     }
   }, [uploading])
 
-  const changeVisibilityofVideoUploadPannel = () => {
-    setUploadPannelVisibility((e) => !e);
+  useEffect(() => {
+    if (uploaded) {
+      dispatch(fetchMyChannelVideos({ username }));
+      dispatch(fetchMyChannelDetails({ username }));
+    }
+  }, [dispatch, uploaded, username]);
+
+  const openUploadPanel = () => {
+    dispatch(resetUploadedVideo());
+    setIsUploadPanelOpen(true);
+  };
+
+  const closeUploadPanel = () => {
+    setIsUploadPanelOpen(false);
+  };
+
+  const closeUploadSuccess = () => {
+    setUploadMeta(null);
+  };
+
+  const handleUploadStart = (meta) => {
+    setUploadMeta(meta);
   }
 
   const navigate = useNavigate();
@@ -68,7 +90,10 @@ function MyChannel({ Compo }) {
               </p>
             </div>
             <div class="flex p-3">
-              <button class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-5 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto">
+              <button
+                onClick={() => navigate(`/@/${username}/setting`)}
+                class="group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-5 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto"
+              >
                 <span class="inline-block w-5">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +113,7 @@ function MyChannel({ Compo }) {
                 Edit
               </button>
               <button
-                onClick={changeVisibilityofVideoUploadPannel}
+                onClick={openUploadPanel}
                 class="mx-5 group/btn mr-1 flex w-full items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto"
               >
                 <span class="inline-block w-5"></span>
@@ -153,17 +178,44 @@ function MyChannel({ Compo }) {
               </li>
             </NavLink>
 
+            <NavLink
+              to={`/@/${username}/like`}
+              className={({ isActive }) =>
+                `w-full border-b-2 px-3 py-1.5 ${isActive ? 'bg-[#e0e0e0] text-[#5a00b3] border-[#5a00b3]' : 'bg-transparent text-gray-700 border-gray-300'
+                }`
+              }
+            >
+              <li className="w-full">
+                <button className="w-full">Like</button>
+              </li>
+            </NavLink>
+
+            <li className="w-full">
+              <button
+                onClick={() => navigate(`/@/${username}/dashboard`)}
+                className="w-full border-b-2 px-3 py-1.5"
+              >
+                Dashboard
+              </button>
+            </li>
 
 
           </ul>
           <Compo />
         </div>
         {/* here upload */}
-        {
-          uploadPannelVisibility && <UploadVideoPopout />
-        }
-        {uploading && <UploadingVideoPopout />}
-        <UploadedSuccess />
+        <UploadVideoPopout
+          isOpen={isUploadPanelOpen}
+          onClose={closeUploadPanel}
+          onUploadStart={handleUploadStart}
+        />
+        {showUploadingOverlay && (
+          <UploadingVideoPopout
+            uploadMeta={uploadMeta}
+            onClose={() => setShowUploadingOverlay(false)}
+          />
+        )}
+        <UploadedSuccess uploadMeta={uploadMeta} onClose={closeUploadSuccess} />
       </section>
     </>
   );

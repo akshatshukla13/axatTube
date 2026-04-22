@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import PlaylistModal from './PlaylistModal';
+import { fetchMyChannelPlaylists } from '@/app/slices/myChannelSlice';
+import { useParams } from 'react-router-dom';
 
 function MyChannelPlaylistPage() {
 
   const dispatch = useDispatch();
+  const { username } = useParams();
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const channelPlaylists = useSelector((state) => state.myChannel.myChannelPlaylistData);
 
   const handlePlaylistCreated = () => {
-    // Refresh playlist data here if needed
+    dispatch(fetchMyChannelPlaylists({ username }));
   };
 
   return (
@@ -38,7 +41,7 @@ function MyChannelPlaylistPage() {
                 <div className="relative mb-2 w-full pt-[56%]">
                   <div className="absolute inset-0">
                   <img
-                    // src={}
+                    src={playlist?.videos?.[0]?.thumbnail || "https://images.pexels.com/photos/1174775/pexels-photo-1174775.jpeg"}
                     alt="thumbnail"
                       className="h-full w-full object-cover rounded-lg"
                   />
@@ -47,10 +50,10 @@ function MyChannelPlaylistPage() {
                         <div className="relative z-[1]">
                           <p className="flex justify-between">
                             <span className="inline-block">Playlist</span>
-                            <span className="inline-block">{playlist.videos.length} videos</span>
+                            <span className="inline-block">{playlist?.videos?.length || 0} videos</span>
                         </p>
                           <p className="text-sm text-gray-200">
-                          100K Views · {playlist.createdAt} ago
+                          Created {new Date(playlist.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>

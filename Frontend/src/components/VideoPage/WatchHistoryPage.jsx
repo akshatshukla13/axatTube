@@ -36,6 +36,9 @@ function WatchHistoryPage() {
     }
 
     try {
+      await axios.delete(`${API_BASE_URL}/users/history`, {
+        withCredentials: true,
+      });
       setHistory([]);
       toast.success("Watch history cleared");
     } catch (error) {
@@ -44,30 +47,39 @@ function WatchHistoryPage() {
     }
   };
 
-  const handleRemoveFromHistory = (videoId) => {
-    setHistory(history.filter((video) => video._id !== videoId));
+  const handleRemoveFromHistory = async (videoId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/users/history/${videoId}`, {
+        withCredentials: true,
+      });
+      setHistory((prev) => prev.filter((video) => video._id !== videoId));
+      toast.success("Removed from history");
+    } catch (error) {
+      toast.error("Failed to remove video from history");
+      console.error(error);
+    }
   };
 
   const handleVideoClick = (videoId) => {
-    navigate(`/watch/${videoId}`);
+    navigate(`/video/${videoId}`);
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#121212]">
-        <div className="text-white">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-[#ae7aff]"></div>
-          <p>Loading watch history...</p>
+      <section className="w-full bg-[#121212] text-white pb-[70px] sm:ml-[70px] sm:pb-0 lg:ml-0">
+        <div className="flex min-h-[calc(100vh-82px)] items-center justify-center">
+          <div className="text-white">
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-[#ae7aff]"></div>
+            <p>Loading watch history...</p>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#121212] text-white">
-      <div className="flex min-h-[calc(100vh-66px)] sm:min-h-[calc(100vh-82px)]">
-        <section className="w-full pb-[70px] sm:ml-[70px] sm:pb-0">
-          <div className="w-full p-4">
+    <section className="w-full bg-[#121212] text-white pb-[70px] sm:ml-[70px] sm:pb-0 lg:ml-0">
+      <div className="w-full p-4">
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
               <h1 className="text-3xl font-bold">Watch History</h1>
@@ -172,10 +184,8 @@ function WatchHistoryPage() {
                 <p className="text-gray-400">Videos you watch will appear here</p>
               </div>
             )}
-          </div>
-        </section>
       </div>
-    </div>
+    </section>
   );
 }
 

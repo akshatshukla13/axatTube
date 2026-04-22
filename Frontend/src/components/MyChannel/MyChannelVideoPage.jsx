@@ -8,11 +8,11 @@ function MyChannelVideoPage() {
 
   return (
     <>
-      {channelVideos ? (
+      {channelVideos && channelVideos.length > 0 ? (
 
         <div class="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-4 pt-2">
           {channelVideos.map((video) => (
-            <div class="w-full">
+            <div key={video._id} class="w-full">
               <div class="relative mb-2 w-full pt-[56%]">
                 <div class="absolute inset-0">
                   <img
@@ -34,7 +34,9 @@ function MyChannelVideoPage() {
             </div>
           ))}
         </div>
-      ) : null}
+      ) : (
+        <p className="pt-6 text-sm text-gray-400">No videos uploaded yet.</p>
+      )}
     </>
   )
 }

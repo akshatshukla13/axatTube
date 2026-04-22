@@ -1,40 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { uplaodVideo } from "@/app/slices/videoSlice";
 import { toast } from "react-toastify";
 
-
-function UploadVideoPopout() {
-
-  const [hidden, setHidden] = useState(true);
+function UploadVideoPopout({ isOpen, onClose, onUploadStart }) {
   const [videoFile, setVideoFile] = useState(null);
   const [videoURL, setVideoURL] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    return () => {
+      if (videoURL) {
+        URL.revokeObjectURL(videoURL);
+      }
+    };
+  }, [videoURL]);
 
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (videoURL) {
+        URL.revokeObjectURL(videoURL);
+      }
       setVideoFile(file);
-      setVideoURL(URL.createObjectURL(file)); // Generate a preview URL for the video
+      setVideoURL(URL.createObjectURL(file));
     }
   };
 
   const handleCancel = () => {
+    if (videoURL) {
+      URL.revokeObjectURL(videoURL);
+    }
     setVideoFile(null);
-    setVideoURL(null); // Remove the selected video and reset the preview
+    setVideoURL(null);
   };
 
-  const changeVisibility = () => {
-    setHidden((e) => !e);
-  };
-
-  const uploadToDB = (e) => {
+  const uploadToDB = async (e) => {
     e.preventDefault();
-    const thumbnailFile = document.getElementById("thumbnail").files[0];
-    const title = document.getElementById("title").value;
-    const description = document.getElementById("desc").value;
 
-    // Validation
     if (!videoFile) {
       toast.error("Please select a video file");
       return;
@@ -58,12 +64,28 @@ function UploadVideoPopout() {
     formData.append("title", title);
     formData.append("description", description);
 
-    dispatch(uplaodVideo({formData}));
-    toast.success("Video upload started!");
-  }
+    onUploadStart?.({
+      fileName: videoFile.name,
+      fileSize: videoFile.size,
+      title,
+    });
+
+    try {
+      await dispatch(uplaodVideo({ formData })).unwrap();
+      toast.success("Video uploaded successfully!");
+      onClose?.();
+      handleCancel();
+      setThumbnailFile(null);
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to upload video");
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    !hidden &&
     <>
       <div className="absolute inset-0 z-10 bg-black/50 px-4 pb-[86px] pt-4 sm:px-14 sm:py-8">
         <div className="h-auto overflow-auto border bg-[#121212]">
@@ -73,7 +95,7 @@ function UploadVideoPopout() {
               Save
             </button>
             <button
-              onClick={changeVisibility}
+              onClick={onClose}
               className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-[5px] active:translate-y-[5px] active:shadow-[0px_0px_0px_0px_#4f4e4e]"
             >
               Cancel
@@ -140,6 +162,7 @@ function UploadVideoPopout() {
               <input
                 id="thumbnail"
                 type="file"
+                onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
                 className="w-full border p-1 file:mr-4 file:border-none file:bg-[#ae7aff] file:px-3 file:py-1.5"
               />
             </div>
@@ -150,6 +173,8 @@ function UploadVideoPopout() {
               <input
                 id="title"
                 type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="w-full border bg-transparent px-2 py-1 outline-none"
               />
             </div>
@@ -159,6 +184,8 @@ function UploadVideoPopout() {
               </label>
               <textarea
                 id="desc"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className="h-40 w-full resize-none border bg-transparent px-2 py-1 outline-none"
               ></textarea>
             </div>

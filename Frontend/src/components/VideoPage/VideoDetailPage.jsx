@@ -20,7 +20,21 @@ function VideoDetailPage() {
   useEffect(() => {
     dispatch(fetchPerticularVideoDetails({ id }));
     dispatch(fetchVideoComments({ id }));
-  }, []);
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await axios.post(
+          `${API_BASE_URL}/users/history/${id}`,
+          {},
+          { withCredentials: true },
+        );
+      } catch (error) {
+        // Skip error toast for guests; history sync requires logged-in user.
+      }
+    })();
+  }, [id]);
 
   useEffect(() => {
     (async () => {

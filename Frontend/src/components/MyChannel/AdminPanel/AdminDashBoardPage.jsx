@@ -1,7 +1,13 @@
-import { fetchMyChannelDetails, fetchMyChannelPlaylists, fetchMyChannelTweets, fetchMyChannelVideos, fetchMySubscribedChannels } from '@/app/slices/myChannelSlice';
-import React, { useEffect } from 'react'
+import { fetchMyChannelDetails, fetchMyChannelVideos } from '@/app/slices/myChannelSlice';
+import { fetchLikedVideos } from '@/app/slices/likeSlice';
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios';
+import API_BASE_URL from '@/config/api.config';
+import { toast } from 'react-toastify';
+import EditVideoPopup from './EditVideoPopup';
+import DeleteVideopopup from './DeleteVideopopup';
 
 function AdminDashBoardPage() {
 
@@ -10,13 +16,74 @@ function AdminDashBoardPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("Username: ", username);
     dispatch(fetchMyChannelDetails({ username }))
     dispatch(fetchMyChannelVideos({ username }))
-  }, [])
+    dispatch(fetchLikedVideos());
+    fetchSubscribedChannelsCount();
+  }, [dispatch, username])
 
   const channelDetails = useSelector((state) => state.myChannel.myChannelData);
   const channelVideos = useSelector((state) => state.myChannel.myChannelVideosData);
+  const likedVideos = useSelector((state) => state.like.likedVideosData);
+  const [localVideos, setLocalVideos] = useState([]);
+  const [editVideo, setEditVideo] = useState(null);
+  const [deleteVideo, setDeleteVideo] = useState(null);
+  const [subscribedChannelsCount, setSubscribedChannelsCount] = useState(0);
+
+  useEffect(() => {
+    setLocalVideos(Array.isArray(channelVideos) ? channelVideos : []);
+  }, [channelVideos]);
+
+  const fetchSubscribedChannelsCount = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/subscribe/c/:subscriberId`,
+        { withCredentials: true }
+      );
+      const count = (response.data.data || []).length;
+      setSubscribedChannelsCount(count);
+    } catch (error) {
+      console.error("Failed to fetch subscribed channels count:", error);
+    }
+  };
+
+  const handleTogglePublish = async (video) => {
+    try {
+      const response = await axios.patch(
+        `${API_BASE_URL}/videos/toggle/publish/${video._id}`,
+        {},
+        { withCredentials: true },
+      );
+
+      const updatedVideo = response.data?.data;
+      setLocalVideos((prev) =>
+        prev.map((item) =>
+          item._id === video._id
+            ? { ...item, isPublished: updatedVideo?.isPublished ?? !item.isPublished }
+            : item,
+        ),
+      );
+      toast.success("Video visibility updated");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update visibility");
+    }
+  };
+
+  const handleDeleteDone = (deletedId) => {
+    setLocalVideos((prev) => prev.filter((item) => item._id !== deletedId));
+    dispatch(fetchMyChannelDetails({ username }));
+  };
+
+  const handleEditDone = (updatedVideo) => {
+    if (!updatedVideo?._id) {
+      dispatch(fetchMyChannelVideos({ username }));
+      return;
+    }
+
+    setLocalVideos((prev) =>
+      prev.map((item) => (item._id === updatedVideo._id ? { ...item, ...updatedVideo } : item)),
+    );
+  };
 
   return (
     channelDetails &&
@@ -120,14 +187,54 @@ function AdminDashBoardPage() {
                   <h6 class="text-gray-300">Total likes</h6>
                   <p class="text-3xl font-semibold">{channelDetails.totalLikes}</p>
                 </div>
+                <div class="border p-4">
+                  <div class="mb-4 block">
+                    <span class="inline-block h-7 w-7 rounded-full bg-[#E4D3FF] p-1 text-[#ae7aff]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        aria-hidden="true">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"></path>
+                      </svg>
+                    </span>
+                  </div>
+                  <h6 class="text-gray-300">Liked Videos</h6>
+                  <p class="text-3xl font-semibold">{Array.isArray(likedVideos) ? likedVideos.length : 0}</p>
+                </div>
+                <div class="border p-4">
+                  <div class="mb-4 block">
+                    <span class="inline-block h-7 w-7 rounded-full bg-[#E4D3FF] p-1 text-[#ae7aff]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        aria-hidden="true">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 001.591-.068A9.333 9.333 0 0021 19.25a9.333 9.333 0 00-7.333-9.167A9.46 9.46 0 009 9c0 .82.104 1.617.292 2.387A9.481 9.481 0 007.5 19.5a9.493 9.493 0 007.5-.372zm0 0a9.023 9.023 0 01-4.606-1.554.75.75 0 10-.776 1.233A10.524 10.524 0 0015 21M6.75 13.5H3.75m3 2.25H3m10.5-11.25h-3.75m3 2.25h-3"></path>
+                      </svg>
+                    </span>
+                  </div>
+                  <h6 class="text-gray-300">Subscribed Channels</h6>
+                  <p class="text-3xl font-semibold">{subscribedChannelsCount}</p>
+                </div>
               </div>
               <div class="w-full overflow-auto">
                 <table class="w-full min-w-[1200px] border-collapse border text-white">
                   <thead>
                     <tr>
                       <th class="border-collapse border-b p-4">Status</th>
-                      <th class="border-collapse border-b p-4">Status</th>
-                      <th class="border-collapse border-b p-4">Uploaded</th>
+                      <th class="border-collapse border-b p-4">Visibility</th>
+                      <th class="border-collapse border-b p-4">Video</th>
                       <th class="border-collapse border-b p-4">Rating</th>
                       <th class="border-collapse border-b p-4">Date uploaded</th>
                       <th class="border-collapse border-b p-4"></th>
@@ -135,19 +242,20 @@ function AdminDashBoardPage() {
                   </thead>
                   <tbody>
                     {
-                      channelVideos &&
-                      channelVideos.map((video) => (
-                        <tr class=" border-red-500 group border">
+                      localVideos &&
+                      localVideos.map((video) => (
+                        <tr key={video._id} class=" border-red-500 group border">
                           <td class=" border-collapse border-b border-gray-600 px-4 py-3 group-last:border-none">
                             <div class="flex justify-center">
                               <label
-                                for="vid-pub-1"
+                                for={`vid-pub-${video._id}`}
                                 class="relative inline-block w-12 cursor-pointer overflow-hidden">
                                 <input
                                   type="checkbox"
-                                  id="vid-pub-1"
+                                  id={`vid-pub-${video._id}`}
                                   class="peer sr-only"
-                                  checked="" />
+                                  checked={video.isPublished === true}
+                                  onChange={() => handleTogglePublish(video)} />
                                 <span
                                   class="inline-block h-6 w-full rounded-2xl bg-gray-200 duration-200 after:absolute after:bottom-1 after:left-1 after:top-1 after:h-4 after:w-4 after:rounded-full after:bg-black after:duration-200 peer-checked:bg-[#ae7aff] peer-checked:after:left-7"></span>
                               </label>
@@ -160,7 +268,7 @@ function AdminDashBoardPage() {
                             <div class="flex items-center gap-4">
                               <img
                                 class="h-10 w-10 rounded-full"
-                                src="https://images.pexels.com/photos/3532545/pexels-photo-3532545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                src={video.thumbnail}
                                 alt="Code Master" />
                               <h3 class="font-semibold">{video.title}</h3>
                             </div>
@@ -174,7 +282,10 @@ function AdminDashBoardPage() {
                           <td class="border-collapse border-b border-gray-600 px-4 py-3 group-last:border-none">{video.updatedAt}</td>
                           <td class="border-collapse border-b border-gray-600 px-4 py-3 group-last:border-none">
                             <div class="flex gap-4">
-                              <button class="h-5 w-5 hover:text-[#ae7aff]">
+                              <button
+                                onClick={() => setDeleteVideo(video)}
+                                class="h-5 w-5 hover:text-[#ae7aff]"
+                              >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
@@ -188,7 +299,10 @@ function AdminDashBoardPage() {
                                     d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path>
                                 </svg>
                               </button>
-                              <button class="h-5 w-5 hover:text-[#ae7aff]">
+                              <button
+                                onClick={() => setEditVideo(video)}
+                                class="h-5 w-5 hover:text-[#ae7aff]"
+                              >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
@@ -207,6 +321,15 @@ function AdminDashBoardPage() {
                         </tr>
                       ))
                     }
+                    {
+                      localVideos && localVideos.length === 0 && (
+                        <tr>
+                          <td class="px-4 py-6 text-center text-gray-400" colSpan="6">
+                            No videos found.
+                          </td>
+                        </tr>
+                      )
+                    }
 
 
                   </tbody>
@@ -215,6 +338,20 @@ function AdminDashBoardPage() {
             </div>
           </div>
         </div>
+
+        <EditVideoPopup
+          isOpen={Boolean(editVideo)}
+          video={editVideo}
+          onClose={() => setEditVideo(null)}
+          onSaved={handleEditDone}
+        />
+
+        <DeleteVideopopup
+          isOpen={Boolean(deleteVideo)}
+          video={deleteVideo}
+          onClose={() => setDeleteVideo(null)}
+          onDeleted={handleDeleteDone}
+        />
 
       </>
     )

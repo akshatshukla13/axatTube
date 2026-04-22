@@ -11,6 +11,9 @@ import {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  addToWatchHistory,
+  removeFromWatchHistory,
+  clearWatchHistory,
   getUserIdByUserName
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -54,13 +57,16 @@ router
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 router
-  .route("/avatar")
+  .route("/coverImage")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
 
 router.route("/c/:userName").get(verifyJWT, getUserChannelProfile);
 
 router.route("/history").get(verifyJWT, getWatchHistory);
+router.route("/history").delete(verifyJWT, clearWatchHistory);
+router.route("/history/:videoId").post(verifyJWT, addToWatchHistory);
+router.route("/history/:videoId").delete(verifyJWT, removeFromWatchHistory);
 
 router.route("/uid/:userName").get(getUserIdByUserName);
 

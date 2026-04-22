@@ -3,6 +3,7 @@ import {
     getSubscribedChannels,
     getUserChannelSubscribers,
     toggleSubscription,
+    getSubscribedChannelsVideos,
 } from "../controllers/subscription.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import { upload } from '../middlewares/multer.middleware.js';
@@ -13,8 +14,9 @@ router.use(verifyJWT,upload.fields([])); // Apply verifyJWT middleware to all ro
 router
     .route("/c/:subscriberId")
     .get(getSubscribedChannels) //
-    
 
+router.route("/videos").get(getSubscribedChannelsVideos)
+    
 router.route("/u/:channelId").get(getUserChannelSubscribers)
                                 .post(toggleSubscription); 
 

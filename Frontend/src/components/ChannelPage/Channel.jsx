@@ -12,13 +12,12 @@ function Channel({ Compo }) {
 
 
   useEffect(() => {
-    console.log("Username: ", username);
     dispatch(fetchChannelDetails({ username }))
     dispatch(fetchChannelVideos({ username }))
     dispatch(fetchChannelTweets({ username }))
     dispatch(fetchChannelPlaylists({ username }))
     dispatch(fetchSubscribedChannels({ username }))
-  }, [])
+  }, [dispatch, username])
 
 
   const channelDetails = useSelector((state) => state.channel.channelData);
@@ -87,7 +86,7 @@ function Channel({ Compo }) {
               <li className="w-full">
                 <button
                   onClick={() => {
-                    navigate(`/@/${username}/videos`);
+                    navigate(`/channel/${username}/videos`);
                   }}
                   className="w-full"
                 >

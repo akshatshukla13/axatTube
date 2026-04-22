@@ -1,16 +1,51 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import API_BASE_URL from "@/config/api.config";
+import { toast } from "react-toastify";
+import { fetchMyChannelTweets } from "@/app/slices/myChannelSlice";
+import { useParams } from "react-router-dom";
 
 function MyChannelTweetPage() {
+  const { username } = useParams();
+  const dispatch = useDispatch();
+  const [tweetInput, setTweetInput] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
 
   const channelTweets = useSelector((state) => state.myChannel.myChannelTweetData)
   const channelDetails = useSelector((state) => state.myChannel.myChannelData);
+
+  const handleCreateTweet = async () => {
+    if (!tweetInput.trim()) {
+      toast.error("Please write something first.");
+      return;
+    }
+
+    setIsPosting(true);
+    try {
+      await axios({
+        method: "post",
+        url: `${API_BASE_URL}/tweet/`,
+        data: { content: tweetInput.trim() },
+        withCredentials: true,
+      });
+      toast.success("Tweet posted");
+      setTweetInput("");
+      dispatch(fetchMyChannelTweets({ username }));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to post tweet");
+    } finally {
+      setIsPosting(false);
+    }
+  };
 
   return (
     <>
 
       <div class="mt-2 border pb-2">
         <textarea
+          value={tweetInput}
+          onChange={(e) => setTweetInput(e.target.value)}
           class="mb-2 h-10 w-full resize-none border-none bg-transparent px-3 pt-2 outline-none"
           placeholder="Write a tweet"
         ></textarea>
@@ -47,8 +82,12 @@ function MyChannelTweetPage() {
               ></path>
             </svg>
           </button>
-          <button class="bg-[#ae7aff] px-3 py-2 font-semibold text-black">
-            Send
+          <button
+            onClick={handleCreateTweet}
+            disabled={isPosting}
+            class="bg-[#ae7aff] px-3 py-2 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPosting ? "Posting..." : "Send"}
           </button>
         </div>
       </div>
@@ -56,7 +95,7 @@ function MyChannelTweetPage() {
 
         {
           channelTweets && channelDetails ? (
-            channelTweets.map((tweet) => (<div class="flex gap-3 border-b border-gray-700 py-4 last:border-b-transparent">
+            channelTweets.map((tweet) => (<div key={tweet._id} class="flex gap-3 border-b border-gray-700 py-4 last:border-b-transparent">
               <div class="h-14 w-14 shrink-0">
                 <img
                   src={channelDetails.ChannelDetails.avatar}
@@ -121,8 +160,7 @@ function MyChannelTweetPage() {
               </div>
             </div>)))
             :
-            <>
-            </>
+            <p className="py-6 text-sm text-gray-400">No tweets yet. Share your first update.</p>
         }
 
 

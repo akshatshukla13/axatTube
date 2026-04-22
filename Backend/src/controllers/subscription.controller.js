@@ -1,6 +1,7 @@
 import mongoose, { isValidObjectId } from 'mongoose';
 import { User } from '../Models/user.model.js';
 import { Subscription } from '../Models/subscription.model.js';
+import { Video } from '../Models/video.model.js';
 import { ApiError } from '../utils/APIerror.js';
 import { ApiResponse } from '../utils/APIresponse.js';
 import { AsyncHandler } from '../utils/AsyncHandler.js';
@@ -210,4 +211,59 @@ const getSubscribedChannels = AsyncHandler(async (req, res) => {
     .json(new ApiResponse(200, channels, 'Channels fetched successfully'));
 });
 
-export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels };
+const getSubscribedChannelsVideos = AsyncHandler(async (req, res) => {
+  // Get all videos from channels that the user is subscribed to
+  const subscribedChannels = await Subscription.find({
+    subscriber: req.user._id,
+  }).populate('channel', '_id');
+
+  if (!subscribedChannels || subscribedChannels.length === 0) {
+    return res.status(200).json(
+      new ApiResponse(200, [], 'No subscribed channels found')
+    );
+  }
+
+  const channelIds = subscribedChannels.map((sub) => sub.channel._id);
+
+  const videos = await Video.aggregate([
+    {
+      $match: {
+        owner: { $in: channelIds },
+        isPublished: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'owner',
+        foreignField: '_id',
+        as: 'owner',
+        pipeline: [
+          {
+            $project: {
+              userName: 1,
+              fullName: 1,
+              avatar: 1,
+              _id: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: '$owner',
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $limit: 100,
+    },
+  ]);
+
+  res.status(200).json(
+    new ApiResponse(200, videos, 'Subscribed channels videos fetched successfully')
+  );
+});
+
+export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels, getSubscribedChannelsVideos };

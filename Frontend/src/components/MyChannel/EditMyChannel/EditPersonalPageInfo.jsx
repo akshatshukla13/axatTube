@@ -1,14 +1,25 @@
 import React from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 function EditPersonalPageInfo() {
+  const { username } = useParams();
+  const navigate = useNavigate();
+
   return (
-    <header class="sticky inset-x-0 top-0 z-50 w-full border-b border-white bg-[#121212] px-4">
-          <nav class="mx-auto flex max-w-7xl items-center py-2">
-            
-           
-            
-          </nav>
-        </header>
+    <section className="w-full bg-[#121212] p-6 text-white">
+      <div className="mx-auto max-w-3xl rounded-lg border border-gray-700 bg-[#1a1a1a] p-6">
+        <h2 className="mb-2 text-2xl font-semibold">Edit Personal Information</h2>
+        <p className="mb-4 text-sm text-gray-300">
+          Personal profile edits are available in Settings.
+        </p>
+        <button
+          onClick={() => navigate(`/@/${username}/setting`)}
+          className="rounded bg-[#ae7aff] px-4 py-2 font-semibold text-black"
+        >
+          Open Settings
+        </button>
+      </div>
+    </section>
   );
 }
 

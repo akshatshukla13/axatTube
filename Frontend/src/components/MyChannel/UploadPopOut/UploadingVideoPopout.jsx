@@ -1,6 +1,6 @@
 import React from "react";
 
-function UploadingVideoPopout() {
+function UploadingVideoPopout({ uploadMeta, onClose }) {
   return <>
     <div class="absolute inset-x-0 top-0 z-10 flex h-[calc(100vh-66px)] items-center justify-center bg-black/50 px-4 pb-[86px] pt-4 sm:h-[calc(100vh-82px)] sm:px-14 sm:py-8">
       <div class="w-full max-w-lg overflow-auto rounded-lg border border-gray-700 bg-[#121212] p-4">
@@ -9,7 +9,7 @@ function UploadingVideoPopout() {
             Uploading Video...
             <span class="block text-sm text-gray-300">Track your video uploading process.</span>
           </h2>
-          <button class="h-6 w-6">
+          <button class="h-6 w-6" onClick={onClose}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -42,8 +42,12 @@ function UploadingVideoPopout() {
             </span>
           </div>
           <div class="flex flex-col">
-            <h6>Dashboard prototype recording.mp4</h6>
-            <p class="text-sm">16 MB</p>
+            <h6>{uploadMeta?.fileName || "Uploading video"}</h6>
+            <p class="text-sm">
+              {typeof uploadMeta?.fileSize === "number"
+                ? `${(uploadMeta.fileSize / (1024 * 1024)).toFixed(2)} MB`
+                : "Preparing upload..."}
+            </p>
             <div class="mt-2">
               <svg
                 aria-hidden="true"
@@ -64,7 +68,7 @@ function UploadingVideoPopout() {
           </div>
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <button class="border px-4 py-3">Cancel</button>
+          <button class="border px-4 py-3" onClick={onClose}>Cancel</button>
           <button
             class="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]"
             disabled="">

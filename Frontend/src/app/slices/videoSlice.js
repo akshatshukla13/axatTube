@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import API_BASE_URL from "@/config/api.config";
+import parseAxiosError from "@/utils/errorUtil";
 
 //action
 export const fetchVideoDetails = createAsyncThunk(
@@ -78,7 +79,7 @@ const initialState = {
   data: null,
   isError: false,
   perticularVideoData: null,
-  uploadedVideo: true,
+  uploadedVideo: false,
 };
 
 export const videoSlice = createSlice({
@@ -113,14 +114,17 @@ export const videoSlice = createSlice({
 
     builder.addCase(uplaodVideo.pending, (state, action) => {
       state.isLoading = true;
+      state.uploadedVideo = false;
     });
     builder.addCase(uplaodVideo.fulfilled, (state, action) => {
       state.isLoading = false;
+      state.uploadedVideo = action.payload?.data || true;
     });
     builder.addCase(uplaodVideo.rejected, (state, action) => {
       console.log("Error", action.payload);
       state.isError = true;
       state.isLoading = false;
+      state.uploadedVideo = false;
     });
   },
   reducers: {
@@ -128,7 +132,7 @@ export const videoSlice = createSlice({
       state.perticularVideoData = null;
     },
     resetUploadedVideo: (state, action) => {
-      state.uploadedVideo = null;
+      state.uploadedVideo = false;
     },
   },
 });

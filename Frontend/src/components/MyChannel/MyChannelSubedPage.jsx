@@ -1,9 +1,47 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
+import axios from 'axios';
+import API_BASE_URL from '@/config/api.config';
+import { toast } from 'react-toastify';
 
 function MyChannelSubedPage() {
 
   const subscribedChannels = useSelector((state) => state.myChannel.myChannelSubscribedData)
+  const [searchText, setSearchText] = useState("");
+  const [channelsState, setChannelsState] = useState([]);
+
+  useEffect(() => {
+    setChannelsState(Array.isArray(subscribedChannels) ? subscribedChannels : []);
+  }, [subscribedChannels]);
+
+  const filteredChannels = useMemo(() => {
+    if (!channelsState) return [];
+    return channelsState.filter((subs) => {
+      const fullName = subs.fullName || "";
+      const userName = subs.userName || subs.username || "";
+      const text = searchText.toLowerCase();
+      return (
+        fullName.toLowerCase().includes(text) ||
+        userName.toLowerCase().includes(text)
+      );
+    });
+  }, [channelsState, searchText]);
+
+  const handleToggleSubscribe = async (channelId) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/subscribe/u/${channelId}`,
+        {},
+        { withCredentials: true },
+      );
+
+      const message = response?.data?.message || "Subscription updated";
+      setChannelsState((prev) => prev.filter((item) => item._id !== channelId));
+      toast.success(message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update subscription");
+    }
+  };
 
   return (
     <>
@@ -28,14 +66,16 @@ function MyChannelSubedPage() {
             </svg>
           </span>
           <input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             class="w-full bg-transparent outline-none"
             placeholder="Search"
           />
         </div>
 
-        {subscribedChannels ? (
-          subscribedChannels.map((subs) => (
-            <div class="border border-red-500 flex w-full justify-between">
+        {filteredChannels.length > 0 ? (
+          filteredChannels.map((subs) => (
+            <div key={subs._id} class="flex w-full justify-between rounded border border-gray-700 p-2">
               <div class="flex items-center gap-x-2">
                 <div class="h-14 w-14 shrink-0">
                   <img
@@ -46,19 +86,23 @@ function MyChannelSubedPage() {
                 </div>
                 <div class="block">
                   <h6 class="font-semibold">{subs.fullName}</h6>
-                  <p class="text-sm text-gray-300">{subs.subcriberCount} Subscribers</p>
+                  <p class="text-sm text-gray-300">{subs.subcriberCount || 0} Subscribers</p>
                 </div>
               </div>
               <div class="block">
-                <button class="group/btn px-3 py-2 text-black bg-[#ae7aff] focus:bg-white">
-                  <span class="group-focus/btn:hidden">Subscribed</span>
-                  <span class="hidden group-focus/btn:inline">
-                    Subscribe
-                  </span>
+                <button
+                  onClick={() => handleToggleSubscribe(subs._id)}
+                  class="group/btn px-3 py-2 text-black bg-[#ae7aff]"
+                >
+                  Unsubscribe
                 </button>
               </div>
             </div>))
-        ) : (<></>)}
+        ) : (
+          <p className="py-6 text-sm text-gray-400">
+            {searchText ? "No matching channels found." : "You are not subscribed to any channels yet."}
+          </p>
+        )}
 
 
       </div>
