@@ -588,7 +588,7 @@ function VideoDetailPage() {
                 <div class="col-span-12 flex w-full shrink-0 flex-col gap-3 lg:w-[350px] xl:w-[400px]">
                   {sideVideoData &&
                     sideVideoData
-                      .filter((e) => e._id !== id)
+                      .filter((e) => String(e._id) !== String(id))
                       .slice(0, 8)
                       .map((e) => (
                       <>

@@ -71,9 +71,16 @@ const publishAVideo = AsyncHandler(async (req, res) => {
     throw new ApiError(400, "thumbnail required");
   }
 
+  const videoUrl = video.secure_url || video.url;
+  const thumbnailUrl = thumbnail.secure_url || thumbnail.url;
+
+  if (!videoUrl || !thumbnailUrl) {
+    throw new ApiError(400, "Media upload failed");
+  }
+
   const wholeVideo = await Video.create({
-    videoFile: video.secure_url || video.url,
-    thumbnail: thumbnail.secure_url || thumbnail.url,
+    videoFile: videoUrl,
+    thumbnail: thumbnailUrl,
     title,
     discription: description,
     duration: video.duration,
@@ -100,7 +107,11 @@ const getVideoById = AsyncHandler(async (req, res) => {
     throw new ApiError(402, "VideoId required");
   }
 
-  const video = await Video.findById(videoId).populate({
+  const video = await Video.findByIdAndUpdate(
+    videoId,
+    { $inc: { views: 1 } },
+    { new: true }
+  ).populate({
     path: "owner",
     select: "userName email fullName avatar",
   });
@@ -109,10 +120,8 @@ const getVideoById = AsyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid Video Id");
   }
 
-  await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
   const noOfLikes = await Like.countDocuments({ video: video._id });
   const videoObject = video.toObject();
-  videoObject.views = (videoObject.views || 0) + 1;
   videoObject.noOfLikes = noOfLikes;
 
   return res
